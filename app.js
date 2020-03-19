@@ -5,7 +5,7 @@ const express = require('express'),
     mongoose = require('mongoose');
 
 config = {
-    DB: 'mongodb://localhost:27017/ng7crud'
+    DB: 'mongodb://localhost:27017/ng7crud?replicaSet=rs'
  };
 // connect to database
 mongoose.Promise = global.Promise;
@@ -21,24 +21,28 @@ const app = express()
 app.use(bodyParser.json());
 app.use(cors({origin:'http://localhost:4200'}));
 app.use('/session', sessionRoute);
+var server = require('http').createServer(app);
 const port = process.env.PORT || 500;
 
-const server = app.listen(port,function(){
+server.listen(port,function(){
     console.log('Listening on port ' + port);
 });
-// app.listen(port)
 
-// // require the socket.io module
-// const io = require('socket.io');
 
-// const socket = io(http);
-// //create an event listener
+// require the socket.io module
+const io = require('socket.io');
 
-// //To listen to messages
-// socket.on('connection', (socket)=>{
-// console.log('user connected');
-// socket.on("disconnect", ()=>{
-//     console.log("Disconnected")
-// })
-// });
+const socket = io(server);
+//create an event listener
+
+//To listen to messages
+socket.on('connection', (client)=>{
+console.log('user connected');
+    client.emit('server',"ewrgsdf");
+socket.on("disconnect", ()=>{
+    console.log("Disconnected")
+})
+});
+
+
 

@@ -4,6 +4,8 @@
     <canvas id="myChart1"></canvas>
     <button (click)="randomData()">AddData</button>
     <button (click)="removeData(linechart1)">Remove Data</button>
+    <button (click)="getData('5e70a7f5ebefa227047c377b')">Get Data</button>
+    <p>{{data}}</p>
   </div>
   <div class="chart-container" style="position: relative; height:50vh; width:50vw; float:right;">
       <canvas id="myChart"></canvas>
