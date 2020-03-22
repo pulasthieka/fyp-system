@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
+import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 
 
@@ -15,15 +15,21 @@ export class SessionDataService {
   readingSubject = new Subject();
   readings = this.readingSubject.subscribe();
 
-  constructor(@Inject(SESSION_STORAGE) private http : HttpClient, 
-  private browserStorage : WebStorageService ) { }
+  constructor(@Inject(SESSION_STORAGE) private browserStorage : StorageService,
+    private http : HttpClient
+   ) {
+    // set id on creation
+    if (this.browserStorage.get('sessionId')){
+      this.id = this.browserStorage.get('sessionId');
+    }
+   }
 
   newRecording(){
     this.http.post(`${this.uri}/new`, {})
     .subscribe(res => {
         this.browserStorage.set('sessionId', res['id']);
         this.id = res['id'];
-        console.log('New Record Created',res['status'], this.id)});
+        console.log('New Record Created',res['status'])});
     
   }
   addReading(time, reading) {

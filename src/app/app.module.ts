@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-import { StorageServiceModule} from 'angular-webstorage-service';
+// import { SESSION_STORAGE } from 'ngx-webstorage-service';
 import { SessionDataService } from './session-data.service';
  
 const config: SocketIoConfig = { url: 'http://localhost:500', options: {} };
@@ -18,7 +18,6 @@ const config: SocketIoConfig = { url: 'http://localhost:500', options: {} };
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    StorageServiceModule,
     SocketIoModule.forRoot(config)
   ],
   providers: [SessionDataService],

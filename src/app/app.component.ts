@@ -4,7 +4,7 @@ import 'chartjs-plugin-zoom'
 import 'chartjs-plugin-streaming'
 import { SessionDataService } from './session-data.service';
 import { WebsocketService } from './websocket.service';
-import {SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
+import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 
 @Component({
   selector: 'app-root',
@@ -16,10 +16,10 @@ import {SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
 
 export class AppComponent {
   
-constructor( @Inject(SESSION_STORAGE)
+constructor( @Inject(SESSION_STORAGE) private browserStorage : StorageService ,
   private service:SessionDataService, 
-  private dataStream : WebsocketService,
-  private browserStorage : WebStorageService ){}
+  private dataStream : WebsocketService
+  ){}
 
   title = 'gui';
   linechart1: any;
@@ -93,13 +93,13 @@ constructor( @Inject(SESSION_STORAGE)
   }
 
   ngOnInit() {
-    if (this.browserStorage.get('id')){
-      this.getData(this.browserStorage.get('id'));
+    if (this.browserStorage.get('sessionId')){
+      this.getData(this.browserStorage.get('sessionId'));
     }
     // this.getData("5e731175f8d4ba4ad4fa71dd");
     this.dataStream.getMessages().subscribe(
       (message: any[]) => {
-        // console.log(message)
+        console.log(message)
         if(message['updatedFields']){
           for (var key in message['updatedFields']) {
             // console.log("Key: " + key);
@@ -107,7 +107,7 @@ constructor( @Inject(SESSION_STORAGE)
             // console.log("Value: " + message['updatedFields'][key]['value']);
         }
         }
-        console.log(this.data,this.linechart1.data.datasets[0].data)
+        // console.log(this.data,this.linechart1.data.datasets[0].data)
     });
     // // create the charts
     // this.linechart = new Chart('myChart', {
@@ -139,7 +139,7 @@ constructor( @Inject(SESSION_STORAGE)
               // label: '# of Votes',
               data: [],
               // backgroundColor:'rgba(255, 99, 132, 0.0)',
-              // borderColor: 'rgba(255, 159, 64, 1)',
+              borderColor: 'rgba(255, 159, 64, 1)',
               // borderWidth: 1
           }]
       },
@@ -172,8 +172,10 @@ getData(id){
   }
 
   );
+}
 
-
+newRecording(){
+  this.service.newRecording();
 }
   // function to add data to graph
 addData(chart, label, data) {
