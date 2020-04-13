@@ -41,7 +41,7 @@ sessionRoutes.route('/add/:id').post(function (req, res) {
             // business.Pressure.value = req.body.Pressure.value;
             // business.business_gst_number = req.body.business_gst_number;
             console.log(p,t)
-           Session.updateOne({"_id":id},{$push:{Pressure:p,Temperature:t}}).then(business => {
+           Session.updateOne({"_id":id},{$push:{'Pressure':p,'Temperature':t}}).then(business => {
               res.json({'id':id,'status':'Update complete'});
           })
           .catch(err => {

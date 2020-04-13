@@ -42,7 +42,6 @@ const socket = io(server);
 //To listen to messages
 socket.on('connection', (client)=>{
     console.log('user connected');
-    socket.emit("server",["ewgdsfgsd"])
     socket.on("disconnect", ()=>{
     console.log("Disconnected")
     })
