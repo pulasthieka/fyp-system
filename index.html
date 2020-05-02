@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Realtime graphs</title>
+	<script src="socket.io.js"></script>
+	<!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+	<script src="plotly-latest.min.js"></script>
+</head>
+
+<body>
+	<div id="tester" style="width:600px;height:250px;"></div>
+	<script>
+		const socket = io('http://localhost:9000');
+
+		// create a chart
+		TESTER = document.getElementById('tester');
+		Plotly.newPlot(TESTER, [{
+			x: [],
+			y: [],
+			mode: 'lines',
+			line: { color: '#80CAF6' }
+		}], {
+			margin: { t: 0 }
+		});
+
+		var cnt = 0;
+		// socket io messages draw charts
+		socket.on("server", (message) => {
+			console.log(message.updatedFields);
+			cnt = cnt + 1;
+			var firstKey = Object.keys(message.updatedFields)[0];
+			var update = {
+				x: [[cnt]],
+				y: [[message.updatedFields[firstKey].value]]
+			}
+			var olderTime = Math.max(0, cnt - 50);
+			var futureTime = Math.max(cnt, 50);
+
+			var minuteView = {
+				xaxis: {
+					type: 'value',
+					range: [olderTime, futureTime]
+				}
+			};
+			Plotly.relayout(TESTER, minuteView);
+			Plotly.extendTraces(TESTER, update, [0])
+		});
+
+		// testing function for realtime graphs
+		// function rand() {
+		// 	return Math.random();
+		// }
+		// var interval = setInterval(function () {
+		// 	var update = {
+		// 		x: [[cnt]],
+		// 		y: [[rand()]]
+		// 	}
+
+		// 	var olderTime = Math.max(0, cnt - 10);
+		// 	var futureTime = Math.max(cnt, 10);
+
+		// 	var minuteView = {
+		// 		xaxis: {
+		// 			type: 'value',
+		// 			range: [olderTime, futureTime]
+		// 		}
+		// 	};
+
+		// 	Plotly.relayout(TESTER, minuteView);
+		// 	Plotly.extendTraces(TESTER, update, [0])
+
+		// 	if (++cnt === 100) clearInterval(interval);
+		// }, 100);
+
+	</script>
+
+</body>
+
+</html>
