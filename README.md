@@ -30,6 +30,14 @@ Run the below commands in seperate terminals
 
 3. Open `index.html` in a browser
 
+## Navigating the graphs
+
+- Click and drag to zoom
+- Click and drag to create a negative area to switch to horizontal / vertical zoom
+- Mousewheel doesn't work
+
+You can also use the buttons above the graph to navigate the graph.
+
 ## Further help
 
 Just call Pulasthi for extra help
