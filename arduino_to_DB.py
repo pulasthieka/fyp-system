@@ -1,5 +1,5 @@
 import pandas
-import serial
+# import serial
 import time
 import datetime
 from random import random
@@ -21,12 +21,13 @@ client = MongoClient(mongodb_host, 27017)
 db = client[mongodb_db]
 collection = db['sessions']
 
-sessionId = ObjectId("5e987b73f3831c2e84aa1d6a")
+sessionId = ObjectId("5f9d2c1138b0c446e41fe359")
 
-fixed_interval = 0.1
+fixed_interval = 0.05
 print(client, collection)
 
 csv_file = 'E:\ACA Folder\FYP\GITHUB\DATA\Dataset2\H1M26\ReadingPAT.csv'
+
 pData = pandas.read_csv(csv_file, header=None)
 print(pData)
 for index, row in pData.iterrows():
@@ -45,7 +46,7 @@ for index, row in pData.iterrows():
             #     {'_id': sessionId}, {'$push': {'Pressure': pressure}})
 
             doc_id = collection.update_one(
-                {'_id': sessionId}, {'$push': {'Pressure': pressure, 'Temperature': temp}})
+                {'_id': sessionId}, {'$push': {'Pressure': pressure, "Temperature": temp}})
             print("updated", index)
     except ValueError:
         print("some eror")

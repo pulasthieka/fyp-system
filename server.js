@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // mongoose.connect('mongodb://localhost/ng7crud?replicaSet=rs');
 config = {
-  DB: "mongodb://localhost:27017/ng7crud?replicaSet=rs",
+  DB: "mongodb://localhost:27017/ng7crud?replicaSet=rs", // database URL
 };
 mongoose.connect(config.DB, { useNewUrlParser: true }).then(
   () => {
@@ -54,8 +54,8 @@ db.once("open", () => {
     console.log("Node server running on port 9000");
   });
 
-  const taskCollection = db.collection("sessions");
-  const changeStream = taskCollection.watch();
+  const collection2monitor = db.collection("sessions");
+  const changeStream = collection2monitor.watch();
 
   changeStream.on("change", (change) => {
     // console.log(change);
