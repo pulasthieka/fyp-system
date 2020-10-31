@@ -39,5 +39,3 @@ Run the below commands in seperate terminals
 You can also use the buttons above the graph to navigate the graph.
 
 ## Further help
-
-Just call Pulasthi for extra help
