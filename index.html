@@ -2,134 +2,368 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8" />
-	<title>Realtime graphs</title>
+<meta charset="utf-8" />
+	<title>Database connected to CanvasJS</title>
 	<script src="socket.io.js"></script>
-	<!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
-	<script src="plotly-latest.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="styles.css">
+	<script src="jquery-3.5.1.js"></script>
+	<script src="canvasjs.min.js"></script>
 </head>
 
 <body>
-	<div class="ui">
-		<div class="chart-box">
-			<h2 class="chart-title">Pressure</h2>
-			<div class="chart-area" id="pressure"></div>
-		</div>
-		<div class="chart-box">
-			<h2 class="chart-title">Test</h2>
-			<div class="chart-area" id="tester"></div>
-		</div>
-		<div class="chart-box">
-			<h2 class="chart-title">Temperature</h2>
-			<div class="chart-area" id="temp"></div>
-		</div>
-		<div class="chart-box">
-			<h2 class="chart-title">PPG</h2>
-			<div class="chart-area" id="ppg"></div>
-		</div>
-	</div>
-
-
+	<div id="chartContainer" style="height: 150px; width: 100%;"></div>	
+	<div id="chartContainer2" style="height: 150px; width: 100%;"></div>
+	<div id="chartContainer3" style="height: 150px; width: 100%;"></div>	
+	<div id="chartContainer4" style="height: 150px; width: 100%;"></div>		
+	<div id="chartContainer5" style="height: 150px; width: 100%;"></div>	
 	<script>
-		const socket = io('http://localhost:9000');
-
-		// create a chart
-		PRESR = document.getElementById('pressure');
-		Plotly.newPlot(PRESR, [{
-			x: [],
-			y: [],
-			mode: 'lines',
-			line: { color: '#80CAF6' }
-		}], {
-			margin: { t: 0 }
-		});
-
-		TEMP = document.getElementById('temp');
-		Plotly.newPlot(TEMP, [{
-			x: [],
-			y: [],
-			mode: 'lines',
-			line: { color: '#80CAF6' }
-		}], {
-			margin: { t: 0 }
-		});
-
-		TESTER = document.getElementById('tester');
-		Plotly.newPlot(TESTER, [{
-			x: [],
-			y: [],
-			mode: 'lines',
-			line: { color: '#CA80F6' }
-		}], {
-			margin: { t: 0 }
-		});
-
-		var cnt = 0;
-		// socket io messages draw charts
-		socket.on("server", (message) => {
-			// console.log(message);
-			cnt = cnt + 1;
-			var graph;
-			for (var key of Object.keys(message.updatedFields)) {
-				// console.log(key, key.substring(0, 4));
-				graph = TESTER;
-				if (key.substring(0, 4) == "Pres") {
-					graph = PRESR;
+		//defining variables
+		var dps=[]; //array to store the data to be plotted
+		var dps2=[];
+		var dps3=[];
+		var dps4=[];
+		var dps5=[];
+		var axisXMax=0, axisXMin=0;
+		var axisX={};
+		var updateRange=0;
+		var resetFlag= false;
+		var updateInterval = 100;
+		var dataLength = 1000; // number of dataPoints visible at any point
+		var cnt=0;
+		
+		var socket = io('http://localhost:90');//socket connection
+				
+		//define chartOptions
+		var chartOptions ={
+			zoomEnabled: true,
+			//animationEnabled:true,
+			zoomType: "xy",
+			rangeChanged: function(e){
+				if(e.trigger === "zoom"){
+					axisXMax = e.axisX[0].viewportMaximum + 1;
+					console.log(axisXMax);
+					axisXMin = e.axisX[0].viewportMinimum + 1;
+					resetFlag = false;
+					if (updateRange>0) clearInterval(updateRange);
+					updateRange = setInterval(function() {
+						updateAxisRange();//defined below
+					}, updateInterval);
+                } 
+                else if  (e.trigger == "reset"){
+					resetFlag=true;
+					clearInterval(updateRange);
 				}
-				else if (key.substring(0, 4) == "Temp") {
-					graph = TEMP;
+            },
+            title: {
+                text: "Data from NodeMCU",
+            },
+			axisX: axisX,
+			data: [
+				{
+					type:"line",
+					dataPoints: dps,
+				},
+			],
+        };
+		//
+		var chartOptions2 ={
+			zoomEnabled: true,
+			zoomType: "xy",
+			rangeChanged: function(e){
+				if(e.trigger === "zoom"){
+					axisXMax = e.axisX[0].viewportMaximum + 1;
+						console.log(axisXMax);
+					axisXMin = e.axisX[0].viewportMinimum + 1;
+					resetFlag = false;
+					if (updateRange>0) clearInterval(updateRange);
+					updateRange = setInterval(function() {
+						updateAxisRange();//defined below
+					}, updateInterval);
+                } 
+                else if  (e.trigger == "reset"){
+					resetFlag=true;
+					clearInterval(updateRange);
 				}
-				else {
-					graph = TESTER;
+            },
+            title: {
+                text: "Data from ATTiny85 One",
+            },
+			axisX: axisX,
+			data: [
+				{
+					type:"line",
+					dataPoints: dps2,
+				},
+			],
+		};
+		
+		var chartOptions3 ={
+			zoomEnabled: true,
+			zoomType: "xy",
+			rangeChanged: function(e){
+				if(e.trigger === "zoom"){
+					axisXMax = e.axisX[0].viewportMaximum + 1;
+						console.log(axisXMax);
+					axisXMin = e.axisX[0].viewportMinimum + 1;
+					resetFlag = false;
+					if (updateRange>0) clearInterval(updateRange);
+					updateRange = setInterval(function() {
+						updateAxisRange();//defined below
+					}, updateInterval);
+                } 
+                else if  (e.trigger == "reset"){
+					resetFlag=true;
+					clearInterval(updateRange);
 				}
-
-				var update = {
-					x: [[cnt]], // for time stamps switch to [[message.updatedFields[key].time_stamp]],
-					y: [[message.updatedFields[key].value]]
+            },
+            title: {
+                text: "Data from ATTiny85 One",
+            },
+			axisX: axisX,
+			data: [
+				{
+					type:"line",
+					dataPoints: dps3,
+				},
+			],
+		};
+		var chartOptions4 ={
+			zoomEnabled: true,
+			zoomType: "xy",
+			rangeChanged: function(e){
+				if(e.trigger === "zoom"){
+					axisXMax = e.axisX[0].viewportMaximum + 1;
+						console.log(axisXMax);
+					axisXMin = e.axisX[0].viewportMinimum + 1;
+					resetFlag = false;
+					if (updateRange>0) clearInterval(updateRange);
+					updateRange = setInterval(function() {
+						updateAxisRange();//defined below
+					}, updateInterval);
+                } 
+                else if  (e.trigger == "reset"){
+					resetFlag=true;
+					clearInterval(updateRange);
 				}
-				var olderTime = Math.max(0, cnt - 50);
-				var futureTime = Math.max(cnt, 50);
-
-				var minuteView = {
-					xaxis: {
-						type: 'value',
-						range: [olderTime, futureTime]
-					}
-				};
-				Plotly.relayout(graph, minuteView);
-				Plotly.extendTraces(graph, update, [0])
+            },
+            title: {
+                text: "Data from ATTiny85 Two",
+            },
+			axisX: axisX,
+			data: [
+				{
+					type:"line",
+					dataPoints: dps4,
+				},
+			],
+		};
+		
+		var chartOptions5 ={
+			zoomEnabled: true,
+			zoomType: "xy",
+			rangeChanged: function(e){
+				if(e.trigger === "zoom"){
+					axisXMax = e.axisX[0].viewportMaximum + 1;
+						console.log(axisXMax);
+					axisXMin = e.axisX[0].viewportMinimum + 1;
+					resetFlag = false;
+					if (updateRange>0) clearInterval(updateRange);
+					updateRange = setInterval(function() {
+						updateAxisRange();//defined below
+					}, updateInterval);
+                } 
+                else if  (e.trigger == "reset"){
+					resetFlag=true;
+					clearInterval(updateRange);
+				}
+            },
+            title: {
+                text: "Data from ATTiny85 Two",
+            },
+			axisX: axisX,
+			data: [
+				{
+					type:"line",
+					dataPoints: dps5,
+				},
+			],
+        };
+        
+        //create chart
+		var chart=new CanvasJS.Chart("chartContainer",chartOptions);
+		chart.render();
+		             
+		//define updateChart
+		var xVal_1=0;
+        var updateChart = function (upd) {
+			
+			count = upd.length;
+			
+            for (var j = 0; j < count; j++) {
+				
+                dps.push({ x:upd[j][0],y:upd[j][1]
+                    //  x: upd[j].time,//xVal_1,
+                    //  y: upd[j].value
+                });
+			xVal_1++;
 			}
-		});
 
-		// testing function for realtime graphs
-		function rand() {
-			return Math.random();
-		}
-		var interval = setInterval(function () {
-			var update = {
-				x: [[cnt]],
-				y: [[rand()]]
-			}
+        if (dps.length > dataLength) {
+            dps.splice(0,count);
+        }
+        //reset the range of Axis X on selecting the reset option
+        if(resetFlag) {
+            chart.options.axisX.viewportMinimum = null;
+            chart.options.axisX.viewportMaximum = null;
+        }
 
-			var olderTime = Math.max(0, cnt - 10);
-			var futureTime = Math.max(cnt, 10);
+        chart.render();
+    };
+        //define updateAxisRange: function to update the axis X range on zooming
+		var updateAxisRange = function (){    	   	
+			axisXMax += 1;
+			axisXMin += 1;
+			chart.options.axisX.viewportMaximum = axisXMax;
+			chart.options.axisX.viewportMinimum = axisXMin;
+			chart.render();		
+        };
+		////////////////Second Chart\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+		//create chart
+		var chart2=new CanvasJS.Chart("chartContainer2",chartOptions2);
+		chart2.render();
+		var chart3=new CanvasJS.Chart("chartContainer3",chartOptions3);
+		chart3.render();
+		var chart4=new CanvasJS.Chart("chartContainer4",chartOptions4);
+		chart4.render();
+		var chart5=new CanvasJS.Chart("chartContainer5",chartOptions5);
+		chart5.render();
 
-			var minuteView = {
-				xaxis: {
-					type: 'value',
-					range: [olderTime, futureTime]
+		
+		//define updateChart2
+		var xVal_2=0;
+        var updateChart2 = function (upd) {
+            count = upd.length;
+            for (var j = 0; j < count; j++) {
+				
+                dps2.push({ x:upd[j][0],y:upd[j][1]
+                    //  x: upd[j].time,//xVal_2,
+                    //  y: upd[j].value
+				});
+				xVal_2++;
+            }
+
+        if (dps2.length > dataLength) {
+            dps2.splice(0,count);
+        }
+        //reset the range of Axis X on selecting the reset option
+        if(resetFlag) {
+            chart2.options.axisX.viewportMinimum = null;
+            chart2.options.axisX.viewportMaximum = null;
+        }
+
+		chart2.render();};
+
+		var updateChart3 = function (upd) {
+            count = upd.length;
+            for (var j = 0; j < count; j++) {
+				
+                dps3.push({ x:upd[j][0],y:upd[j][1]
+                    //  x: upd[j].time,//xVal_2,
+                    //  y: upd[j].value
+				});
+				xVal_2++;
+            }
+
+        if (dps3.length > dataLength) {
+            dps3.splice(0,count);
+        }
+        //reset the range of Axis X on selecting the reset option
+        if(resetFlag) {
+            chart3.options.axisX.viewportMinimum = null;
+            chart3.options.axisX.viewportMaximum = null;
+        }
+
+		chart3.render();};
+
+		var updateChart4 = function (upd) {
+            count = upd.length;
+            for (var j = 0; j < count; j++) {
+				
+                dps4.push({ x:upd[j][0],y:upd[j][1]
+                    //  x: upd[j].time,//xVal_2,
+                    //  y: upd[j].value
+				});
+				xVal_2++;
+            }
+
+        if (dps4.length > dataLength) {
+            dps4.splice(0,count);
+        }
+        //reset the range of Axis X on selecting the reset option
+        if(resetFlag) {
+            chart4.options.axisX.viewportMinimum = null;
+            chart4.options.axisX.viewportMaximum = null;
+        }
+
+		chart4.render();};
+
+		var updateChart5 = function (upd) {
+            count = upd.length;
+            for (var j = 0; j < count; j++) {
+				
+                dps5.push({ x:upd[j][0],y:upd[j][1]
+                    //  x: upd[j].time,//xVal_2,
+                    //  y: upd[j].value
+				});
+				xVal_2++;
+            }
+
+        if (dps5.length > dataLength) {
+            dps5.splice(0,count);
+        }
+        //reset the range of Axis X on selecting the reset option
+        if(resetFlag) {
+            chart5.options.axisX.viewportMinimum = null;
+            chart5.options.axisX.viewportMaximum = null;
+        }
+
+		chart5.render();};
+		
+
+
+		// obtaining data from socket io to plot the data
+		socket.on("server",(message)=>{
+
+			//console.log("NEW")
+            //console.log(message);
+			var udp=[];
+			var keyval=Object.keys(message.updatedFields)[0][0];
+			var type =Object.keys(message.updatedFields)[0][2];
+			//console.log(type);
+			if(type=="1"){
+			for (var key of Object.keys(message.updatedFields)) {				
+				udp.push([  Number(key.slice(4))  ,  message.updatedFields[key]  ]);
+				//console.log([  Number(key.slice(4))  ,  message.updatedFields[key]  ]);
 				}
-			};
+				if (keyval=="P"){
+					updateChart(udp);
+				}
+				else if (keyval=="E"){
+					updateChart2(udp);
+				}
+				else if (keyval=="T"){
+					updateChart3(udp);
+				}
+				else if (keyval=="S"){
+					updateChart4(udp);
+				}
+				else if (keyval=="B"){
+					updateChart5(udp);
+				}}					
+        });
+		
+		
 
-			Plotly.relayout(TESTER, minuteView);
-			Plotly.extendTraces(TESTER, update, [0])
-
-			if (++cnt === 100) clearInterval(interval);
-		}, 10);
-
-	</script>
-
+    </script>
 </body>
-
 </html>
+		
