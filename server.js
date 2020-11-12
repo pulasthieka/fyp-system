@@ -70,58 +70,28 @@ app.use(bodyParser.json());
 //Var for POST
 var dbObject = db.collection('tryonecol');
 var Data_From_NodeMCU;
-var UART_2;
-var UART_1;
+var S_data_server;
+var T_data_server;
 var nDate;
 var prefixes=["P","E","T","S","B"];//PAT,ECG,Temp,SpO2,BioZ
-var handel;
 var loopbound;
 var data;
-var readings;
-var readings_type;
+var E_data_server;
+var B_data_server;
 //POST to save out data in DB
-app.post("/saveData", function(req, res){
-  //console.log(req.body);  
-
+app.post("/saveData", function(req, res){ 
       Data_From_NodeMCU = req.body.hello;
-      UART_2 = req.body.hello2;
-      UART_1 = req.body.hello3;                    
+      S_data_server = req.body.S_data;
+      B_data_server = req.body.B_data;
+      T_data_server = req.body.T_data;  
+      E_data_server = req.body.E_data;                    
       nDate = Date.now(); 
       
-      //sending ack  
       //console.log(nDate);  
-      //correcting Serial2 buffer overflow
-      handel = /[S|B]/.exec(UART_2);
-      if (handel){UART_2=UART_2.slice(handel.index);}
-      //generating lists
-      readings=Data_From_NodeMCU.split(/[P]/).filter (x => x).map(x => Number(x));                     
-      ///////////////Binning data\\\\\\\\\\\\\
-      //Handling NodeMCU ADC1 data
-     
-      //["P","E","T","S","B"]
-      data=[readings,[],[],[],[]];
-      //Handling Serial2      
-      readings=UART_2.split(/[S|B]/).filter (x => x).map(x => Number(x)); 
-      readings_type = UART_2.split (/[\d|.]+/).filter (x => x);  
-      loopbound=readings_type.length;     
-      for (var dummy_2=0;dummy_2<loopbound;dummy_2++){
-        if (readings_type[dummy_2]=="S"){data[3].push(readings[dummy_2]);}
-        else if(readings_type[dummy_2]=="B"){data[4].push(readings[dummy_2]);}
-        else{console.log("ERROR");console.log(readings,readings_type,);}
-      }
-      //Handling Serial 1
-      var handel = /[E|T]/.exec(UART_1);
-      if (handel){UART_1=UART_1.slice(handel.index);}
 
-      readings=UART_1.split(/[E|T]/).filter (x => x).map(x => Number(x)); 
-      readings_type = UART_1.split (/[\d|.]+/).filter (x => x);  
-      loopbound=readings_type.length;
-      for (var dummy_2=0;dummy_2<loopbound;dummy_2++){
-        if (readings_type[dummy_2]=="E"){data[1].push(readings[dummy_2]);}
-        else if(readings_type[dummy_2]=="T"){data[2].push(readings[dummy_2]);}
-        else{console.log("ERROR");console.log(readings,readings_type,req.body.hello3);}
-      }
-      
+      //["P","E","T","S","B"]
+      data=[Data_From_NodeMCU,E_data_server,T_data_server,S_data_server,B_data_server];
+
       //////////////Sending Data\\\\\\\\\\\\\\\\
       var dummy;
       loopbound=prefixes.length;
