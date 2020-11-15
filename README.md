@@ -39,3 +39,9 @@ Run the below commands in seperate terminals
 You can also use the buttons above the graph to navigate the graph.
 
 ## Further help
+#### Setting up ESP32
+1. Navigate to C:\Users\USERNAME\AppData\Local\Arduino15\packages\esp32\hardware\esp32\VIRSION\cores\esp32
+2. Open HardwareSerial.cpp
+3. Change line 47 to "rxPin = 2;"
+4. Change line 48 to "txPin = 4;"
+5. Restart Arduino IDE
