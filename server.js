@@ -78,8 +78,10 @@ var loopbound;
 var data;
 var E_data_server;
 var B_data_server;
+var docname;
 //POST to save out data in DB
 app.post("/saveData", function(req, res){ 
+     
       Data_From_NodeMCU = req.body.hello;
       S_data_server = req.body.S_data;
       B_data_server = req.body.B_data;
@@ -93,21 +95,16 @@ app.post("/saveData", function(req, res){
       data=[Data_From_NodeMCU,E_data_server,T_data_server,S_data_server,B_data_server];
 
       //////////////Sending Data\\\\\\\\\\\\\\\\
-      var dummy;
+      
       loopbound=prefixes.length;
       for (dummy=0;dummy<loopbound;dummy++){
+        var dummy;
+      docname="AKILA"+prefixes[dummy];
         if (data[dummy].length!=0){
           var field=prefixes[dummy]+".1";
           var time=prefixes[dummy]+".0";
-          //var data_cluster = data[dummy];
-          // var time_cluster =[];
-          // var append;
-          // for (append of data[dummy]){
-          //   time_cluster.push(nDate);
-          // }
-          
           dbObject.updateOne(
-            {name: "AKILA"}, 
+            {name: docname}, 
             {'$push': {[field] :{$each: data[dummy]} }},
             function (err) {
               if (err) 
@@ -116,20 +113,17 @@ app.post("/saveData", function(req, res){
                 console.log(err);
               }})
               ;   
-          // dbObject.updateOne(
-          //   {name: "AKILA"}, 
-          //   //{'$push': {[time] :{$each: time_cluster} }},
-          //   {'$push': {[time] :nDate }},
-          //   function (err) {
-          //     if (err) 
-          //     {
-          //       console.log("DB error:");
-          //       console.log(err);
-          //     }});      
+          dbObject.updateOne(
+            {name: docname}, 
+            //{'$push': {[time] :{$each: time_cluster} }},
+            {'$push': {[time] :nDate }},
+            function (err) {
+              if (err) 
+              {
+                console.log("DB error:");
+                console.log(err);
+              }});      
         }
-
       }  
-      res.send("a");
-  
-	
+      res.send("a");	
 });  
