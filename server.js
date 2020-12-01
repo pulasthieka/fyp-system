@@ -67,6 +67,16 @@ app.get("/canvasjs.min.js", function (req, res) {
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
+//npm install async
+const queue = require("async/queue");
+const q = queue(function(task, cb) {
+  dbObject.updateOne({name:task.docname}, 
+    {'$push': {[task.field] :{$each: task.processed_data} }}, (err) => {
+       if (err) console.log("DB error:", err);
+       cb();
+  });  
+  // console.log('done')   
+}, 1)
 //Var for POST
 var dbObject = db.collection('tryonecol');
 var Data_From_NodeMCU;
@@ -87,9 +97,9 @@ app.post("/saveData", function(req, res){
       B_data_server = req.body.B_data;
       T_data_server = req.body.T_data;  
       E_data_server = req.body.E_data;                    
-      nDate = Date.now(); 
+   //   nDate = Date.now(); 
       
-      //console.log(nDate);  
+    //  console.log(nDate);  
 
       //["P","E","T","S","B"]
       data=[Data_From_NodeMCU,E_data_server,T_data_server,S_data_server,B_data_server];
@@ -103,26 +113,30 @@ app.post("/saveData", function(req, res){
         if (data[dummy].length!=0){
           var field=prefixes[dummy]+".1";
           var time=prefixes[dummy]+".0";
-          dbObject.updateOne(
-            {name: docname}, 
-            {'$push': {[field] :{$each: data[dummy]} }},
-            function (err) {
-              if (err) 
-              {
-                console.log("DB error:");
-                console.log(err);
-              }})
-              ;   
-          dbObject.updateOne(
-            {name: docname}, 
-            //{'$push': {[time] :{$each: time_cluster} }},
-            {'$push': {[time] :nDate }},
-            function (err) {
-              if (err) 
-              {
-                console.log("DB error:");
-                console.log(err);
-              }});      
+          const processed_data = data[dummy];
+          //pusing to database one by one
+          q.push({processed_data,docname,field}); 
+          // dbObject.updateOne(
+          //   {name: docname}, 
+          //   {'$push': {[field] :{$each: data[dummy]} }},
+          //   function (err) {
+          //     if (err) 
+          //     {
+          //       console.log("DB error:");
+          //       console.log(err);
+          //     }})
+          //     ;   
+              ////////////////
+          // dbObject.updateOne(
+          //   {name: docname}, 
+          //   //{'$push': {[time] :{$each: time_cluster} }},
+          //   {'$push': {[time] :nDate }},
+          //   function (err) {
+          //     if (err) 
+          //     {
+          //       console.log("DB error:");
+          //       console.log(err);
+          //     }});      
         }
       }  
       res.send("a");	
