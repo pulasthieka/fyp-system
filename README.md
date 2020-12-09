@@ -62,7 +62,9 @@ You can also use the buttons above the graph to navigate the graph.
 5. Program [ESP32.ino](Hardware\ESP32\ESP323.ino) to ESP32
 6. Program [ATTiny_1.ino](Hardware\ATTiny_1\ATTiny_1.ino) to an ATTiny and connect it's pin 3 to D2 of ESP32
 7. Program [ATTiny_2.ino](Hardware\ATTiny_2\ATTiny_2.ino) to an ATTiny and connect it's pin 3 to RX2 of ESP32
-   ![ESP32 Pinout](images\ESP32-Pinout.jpg)
+
+   <img src="images\ESP32-Pinout.jpg">
+
 8. Run [server.js](server.js) and mongoDB(with replica sets)
    `mongod --dbpath "path-to-database" --replSet "rs"`
 9. Go to port 90 of your localhost to see data plots using index.html
