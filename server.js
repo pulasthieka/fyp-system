@@ -24,7 +24,7 @@ db.on("error", console.error.bind(console, "Connection Error:"));
 var io = require("socket.io");
 var server = require("http").createServer(app);
 
-var socket = io(server)
+var socket = io(server);
 
 socket.on("connection", (client) => {
   console.log("user connected");
@@ -42,10 +42,10 @@ db.once("open", () => {
   const changeStream = taskCollection.watch();
 
   changeStream.on("change", (change) => {
-  // console.log(change.updateDescription.updatedFields);
-  //console.log(keys(change.updateDescription.updatedFields));
+    // console.log(change.updateDescription.updatedFields);
+    //console.log(keys(change.updateDescription.updatedFields));
     if (change.operationType === "update") {
-      socket.emit("server", change.updateDescription);      
+      socket.emit("server", change.updateDescription);
     }
   });
 });
@@ -63,81 +63,79 @@ app.get("/canvasjs.min.js", function (req, res) {
   res.sendFile(__dirname + "/canvasjs.min.js");
 });
 
-
-
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 //npm install async
 const queue = require("async/queue");
-const q = queue(function(task, cb) {
-  dbObject.updateOne({name:task.docname}, 
-    {'$push': {[task.field] :{$each: task.processed_data} }}, (err) => {
-       if (err) console.log("DB error:", err);
-       cb();
-  });  
-  // console.log('done')   
-}, 1)
+const q = queue(function (task, cb) {
+  console.log(task);
+  dbObject.updateOne({ name: task.docname }, { $push: { [task.field]: { $each: task.processed_data } } }, (err) => {
+    if (err) console.log("DB error:", err);
+    cb();
+  });
+  // console.log('done')
+}, 1);
 //Var for POST
-var dbObject = db.collection('tryonecol');
+var dbObject = db.collection("tryonecol");
 var Data_From_NodeMCU;
 var S_data_server;
 var T_data_server;
 var nDate;
-var prefixes=["P","E","T","S","B"];//PAT,ECG,Temp,SpO2,BioZ
+var prefixes = ["P", "E", "T", "S", "B"]; // PAT,ECG,Temp,SpO2,BioZ
 var loopbound;
 var data;
 var E_data_server;
 var B_data_server;
 var docname;
 //POST to save out data in DB
-app.post("/saveData", function(req, res){ 
-     
-      Data_From_NodeMCU = req.body.hello;
-      S_data_server = req.body.S_data;
-      B_data_server = req.body.B_data;
-      T_data_server = req.body.T_data;  
-      E_data_server = req.body.E_data;                    
-   //   nDate = Date.now(); 
-      
-    //  console.log(nDate);  
+app.post("/saveData", function (req, res) {
+  console.log("Data", req.body);
+  Data_From_NodeMCU = req.body.hello;
+  S_data_server = req.body.S_data;
+  B_data_server = req.body.B_data;
+  T_data_server = req.body.T_data;
+  E_data_server = req.body.E_data;
+  //   nDate = Date.now();
 
-      //["P","E","T","S","B"]
-      data=[Data_From_NodeMCU,E_data_server,T_data_server,S_data_server,B_data_server];
+  //  console.log(nDate);
 
-      //////////////Sending Data\\\\\\\\\\\\\\\\
-      
-      loopbound=prefixes.length;
-      for (dummy=0;dummy<loopbound;dummy++){
-        var dummy;
-      docname="AKILA"+prefixes[dummy];
-        if (data[dummy].length!=0){
-          var field=prefixes[dummy]+".1";
-          var time=prefixes[dummy]+".0";
-          const processed_data = data[dummy];
-          //pusing to database one by one
-          q.push({processed_data,docname,field}); 
-          // dbObject.updateOne(
-          //   {name: docname}, 
-          //   {'$push': {[field] :{$each: data[dummy]} }},
-          //   function (err) {
-          //     if (err) 
-          //     {
-          //       console.log("DB error:");
-          //       console.log(err);
-          //     }})
-          //     ;   
-              ////////////////
-          // dbObject.updateOne(
-          //   {name: docname}, 
-          //   //{'$push': {[time] :{$each: time_cluster} }},
-          //   {'$push': {[time] :nDate }},
-          //   function (err) {
-          //     if (err) 
-          //     {
-          //       console.log("DB error:");
-          //       console.log(err);
-          //     }});      
-        }
-      }  
-      res.send("a");	
-});  
+  //["P","E","T","S","B"]
+  data = [Data_From_NodeMCU, E_data_server, T_data_server, S_data_server, B_data_server];
+
+  //////////////Sending Data\\\\\\\\\\\\\\\\
+
+  loopbound = prefixes.length;
+  for (dummy = 0; dummy < loopbound; dummy++) {
+    var dummy;
+    docname = "AKILA" + prefixes[dummy];
+    if (data[dummy].length != 0) {
+      var field = prefixes[dummy] + ".1";
+      var time = prefixes[dummy] + ".0";
+      const processed_data = data[dummy];
+      //pusing to database one by one
+      q.push({ processed_data: processed_data, docname: docname, field: field });
+      // dbObject.updateOne(
+      //   {name: docname},
+      //   {'$push': {[field] :{$each: data[dummy]} }},
+      //   function (err) {
+      //     if (err)
+      //     {
+      //       console.log("DB error:");
+      //       console.log(err);
+      //     }})
+      //     ;
+      ////////////////
+      // dbObject.updateOne(
+      //   {name: docname},
+      //   //{'$push': {[time] :{$each: time_cluster} }},
+      //   {'$push': {[time] :nDate }},
+      //   function (err) {
+      //     if (err)
+      //     {
+      //       console.log("DB error:");
+      //       console.log(err);
+      //     }});
+    }
+  }
+  res.send("a");
+});
