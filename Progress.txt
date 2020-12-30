@@ -37,3 +37,5 @@ O_328 - simulated PAT
 P_328 - temeperature
 
 Q_328 - SpO2 + Bioz
+
+R_328 - Two Temp Sensors

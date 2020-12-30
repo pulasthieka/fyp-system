@@ -23,10 +23,10 @@ uint8_t dum = 0;
 String payload = "";
 
 
-const char* ssid = "TP-LINK_85D38C";
-const char* password = "passcode1";
+const char* ssid ="Boarding";// "TP-LINK_85D38C";
+const char* password = "0114436861";//"passcode1";
 
-const char* nodejs_ip = "192.168.1.101";
+const char* nodejs_ip = "192.168.8.106";//"192.168.1.101";
 const int nodejs_port = 90;
 
 WiFiServer server(80);
@@ -59,7 +59,7 @@ void setup() {
   pinMode(23, INPUT);
   pinMode(22, INPUT);
   //Serial com
-  Serial.begin(2000000);
+  Serial.begin(115200);
   Serial1.begin(2000000);
   Serial2.begin(2000000);
   //Setting Serial Buffer size
