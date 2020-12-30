@@ -1,0 +1,17 @@
+Time=0
+T[2650]
+PPG[3440]
+
+Time=5min
+T[25100]
+PPG[33080]
+
+Time=8min
+T[38600]
+PPG[50840]
+
+Time=18min
+T[83100]
+PPG[109500]
+
+Note - I think full occlusion was not achieved because I could see the PPG wave throughout the procedure

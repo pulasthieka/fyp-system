@@ -1,0 +1,15 @@
+Time=0
+T[6650]
+PPG[7280]
+
+Time=6min10sec
+T[34000]
+PPG[43700]
+
+Time=9min10sec
+T[47900]
+PPG[61620]
+
+Time=22min10sec
+T[106350]
+PPG[138700]
