@@ -1,16 +1,4 @@
-# Getting started
-
-1. Install ESP32 core for Arduino IDE (for versions prior to v1.8.13)
-2. Install the required libraries
-   - HardwareSerial by Adrian McEwen
-   - Adafruit SSD1306 by Adafruit
-   - Other libraries are either already available or installed along with others.
-3. Plug in your ESP32, select the correct COM PORT and select the board as `DOIT ESP32 DEVKIT V1`
-4. Compile and upload code
-
-**WARNING :** This is designed to work alongside ATmega328P programmed with [ATmega328-ppg&bio-imp.ino](../ATmega328-ppg&bio-imp/ATmega328-ppg&bio-imp.ino) and [ATmega328-temperature.ino](../ATmega328-temperature/ATmega328-temperature.ino)
-
-## Extending support for other signals
+# Extending support for other signals
 
 1. Create variable to store signal data
    ```c++

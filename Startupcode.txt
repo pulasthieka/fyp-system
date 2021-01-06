@@ -1,6 +1,6 @@
 Run the below commands in seperate terminals
 #start database with replicaset
-cd MongoDB\Server\4.2\bin
+cd ..\MongoDB\Server\4.2\bin
 mongod --dbpath "E:\ACA Folder\FYP\GUI\data" --replSet "rs"
 
 #start node server
