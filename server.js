@@ -68,7 +68,7 @@ app.use(bodyParser.json());
 //npm install async
 const queue = require("async/queue");
 const q = queue(function (task, cb) {
-  console.log(task);
+  // console.log(task);
   dbObject.updateOne({ name: task.docname }, { $push: { [task.field]: { $each: task.processed_data } } }, (err) => {
     if (err) console.log("DB error:", err);
     cb();
@@ -91,10 +91,10 @@ var docname;
 app.post("/saveData", function (req, res) {
   console.log("Data", req.body);
   Data_From_NodeMCU = req.body.hello;
-  S_data_server = req.body.S_data;
-  B_data_server = req.body.B_data;
-  T_data_server = req.body.T_data;
-  E_data_server = req.body.E_data;
+  S_data_server = req.body.SData;
+  B_data_server = req.body.BData;
+  T_data_server = req.body.TData;
+  E_data_server = req.body.EData;
   //   nDate = Date.now();
 
   //  console.log(nDate);
