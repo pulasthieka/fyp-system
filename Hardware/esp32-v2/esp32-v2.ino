@@ -12,6 +12,7 @@ String TData = "[";
 String EData = "[";
 String BData = "[";
 String SData = "[";
+String PData = "[";
 String P_data = "["; //to store ADC (P data) not a buffer
 long PAT = 0;        //for PAT signal
 
@@ -21,7 +22,7 @@ char rx = 'X'; //to read first byte from serial buffer
 const char *ssid = "Boarding";       // "TP-LINK_85D38C";
 const char *password = "0114436861"; //"passcode1";
 
-const char *nodejs_ip = "192.168.8.101"; //"192.168.1.101";
+const char *nodejs_ip = "192.168.8.104"; //"192.168.1.101";
 const int nodejs_port = 90;
 
 WiFiServer server(80);
@@ -120,10 +121,10 @@ void Send_data(WiFiClient cl)
             removeComma(EData);
             removeComma(BData);
             removeComma(SData);
-            //removeComma(&TData);
+            removeComma(PData);
 
             http.addHeader("Content-Type", "application/json");
-            payload = "{\"hello\":" + P_data + "], \"SData\":" + SData + "] , \"BData\" : " + BData + "], \"TData\" : " + TData + "], \"EData\" : " + EData + "] }";
+            payload = "{\"hello\":" + PData + "], \"SData\":" + SData + "] , \"BData\" : " + BData + "], \"TData\" : " + TData + "], \"EData\" : " + EData + "] }";
             Serial.println(payload);
             int httpCode = http.POST(payload);
             resetData();
@@ -176,6 +177,10 @@ void readBuffer(HardwareSerial buffReader)
             active = true;
             combineTo = &BData;
             break;
+         case 'P':
+            active = true;
+            combineTo = &PData;
+            break;
         default:
             if (active)
             {
@@ -209,6 +214,7 @@ void resetData()
     EData = "[";
     SData = "[";
     BData = "[";
+    PData = "[";
 }
 //Functions for display
 void configureDisplay()
