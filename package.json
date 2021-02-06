@@ -1,26 +1,31 @@
 {
-  "name": "fyp-gui",
-  "version": "0.0.1",
-  "private": true,
-  "description": "User interface web application for final year project ",
-  "main": "index.html",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "web",
-    "graphs",
-    "realtime",
-    "biosignals"
-  ],
-  "author": "Pulasthi Ekanayake",
-  "license": "ISC",
-  "dependencies": {
-    "async": "^3.2.0",
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "mongoose": "^5.9.11",
-    "socket.io": "^2.3.0"
-  }
+    "name": "fyp-gui",
+    "version": "0.0.1",
+    "private": true,
+    "description": "User interface web application for final year project ",
+    "main": "index.html",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "web",
+        "graphs",
+        "realtime",
+        "biosignals"
+    ],
+    "author": "Pulasthi Ekanayake",
+    "license": "ISC",
+    "dependencies": {
+        "async": "^3.2.0",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "mongoose": "^5.9.11",
+        "socket.io": "^2.3.0",
+        "ws": "^7.4.3"
+    },
+    "optionalDependencies": {
+        "bufferutil": "^4.0.3",
+        "utf-8-validate": "^5.0.4"
+    }
 }
