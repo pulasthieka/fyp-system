@@ -19,10 +19,10 @@ long PAT = 0;        //for PAT signal
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char *ssid = "Boarding";       // "TP-LINK_85D38C";
-const char *password = "0114436861"; //"passcode1";
+const char *ssid = "TP-LINK_85D38C";
+const char *password = "passcode1";
 
-const char *nodejs_ip = "192.168.8.104"; //"192.168.1.101";
+const char *nodejs_ip = "192.168.1.100"; //"192.168.1.101";
 const int nodejs_port = 90;
 
 WiFiServer server(80);
@@ -110,13 +110,13 @@ void Send_data(WiFiClient cl)
             {
                 currentMillis = millis();
                 delayMicroseconds(5);
-                readPressure();
+//                readPressure();
                 readBuffer(MySerial1);
-                readPressure(); // include in readBuffer to increase Sampling
+//                readPressure(); // include in readBuffer to increase Sampling
                 readBuffer(Serial2);
             }
             previousMillis = currentMillis;
-            removeComma(P_data);
+//            removeComma(P_data);
             removeComma(TData);
             removeComma(EData);
             removeComma(BData);
@@ -124,7 +124,7 @@ void Send_data(WiFiClient cl)
             removeComma(PData);
 
             http.addHeader("Content-Type", "application/json");
-            payload = "{\"hello\":" + PData + "], \"SData\":" + SData + "] , \"BData\" : " + BData + "], \"TData\" : " + TData + "], \"EData\" : " + EData + "] }";
+            payload = "{\"PData\":" + PData + "], \"SData\":" + SData + "] , \"BData\" : " + BData + "], \"TData\" : " + TData + "], \"EData\" : " + EData + "] }";
             Serial.println(payload);
             int httpCode = http.POST(payload);
             resetData();
@@ -145,7 +145,7 @@ void readPressure()
 }
 // buffer reading function
 void readBuffer(HardwareSerial buffReader)
-{
+{ //R
     boolean active = false;
     String *combineTo;
     while (buffReader.available())
@@ -173,7 +173,7 @@ void readBuffer(HardwareSerial buffReader)
             active = true;
             combineTo = &SData;
             break;
-        case 'B':
+        case 'R':
             active = true;
             combineTo = &BData;
             break;
