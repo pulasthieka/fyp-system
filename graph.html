@@ -13,6 +13,10 @@
 </head>
 
 <body>
+	<button id='baseline' value="baseline" class="btn-link">Baseline</button>
+	<button id='occlusion' value="occlusion" class="btn-link">Occlusion</button>
+	<button id='release' value="release" class="btn-link">Cuff Release</button>
+	<!-- <a href="/save?event=baseline">Start Baseline</a> -->
 	<div id="chartContainer" style="height: 150px; width: 100%;"></div>
 	<div id="chartContainer2" style="height: 150px; width: 100%;"></div>
 	<div id="chartContainer3" style="height: 150px; width: 100%;"></div>
@@ -30,7 +34,7 @@
 		var updateRange = 0;
 		var resetFlag = false;
 		var updateInterval = 100;
-		var dataLength = 1000; // number of dataPoints visible at any point
+		var dataLength = 200; // number of dataPoints visible at any point
 		var cnt = 0;
 
 		var socket = io('http://localhost:90');//socket connection
@@ -199,12 +203,12 @@
 		var xVal_1 = 0;
 		var updateChart = function (upd) {
 
-			count = upd.length;
+			count = upd.time.length;
 
 			for (var j = 0; j < count; j++) {
 
 				dps.push({
-					x: upd[j][0], y: upd[j][1]
+					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_1,
 					//  y: upd[j].value
 				});
@@ -245,17 +249,16 @@
 		//define updateChart2
 		var xVal_2 = 0;
 		var updateChart2 = function (upd) {
-			count = upd.length;
+			count = upd.time.length;
 			for (var j = 0; j < count; j++) {
 
 				dps2.push({
-					x: upd[j][0], y: upd[j][1]
+					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_2,
 					//  y: upd[j].value
 				});
 				xVal_2++;
 			}
-
 			if (dps2.length > dataLength) {
 				dps2.splice(0, count);
 			}
@@ -341,40 +344,46 @@
 		};
 
 
-
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const uid = urlParams.get('id')
+		console.log(uid)
+		socket.emit('db', uid)
 		// obtaining data from socket io to plot the data
-		socket.on("server", (message) => {
-
-			//console.log("NEW")
-			//  console.log(message);
-			var udp = [];
-			var keyval = Object.keys(message.updatedFields)[0][0];
-			var type = Object.keys(message.updatedFields)[0][2];
-			//console.log(type);
-			if (type == "1") {
-				for (var key of Object.keys(message.updatedFields)) {
-					udp.push([Number(key.slice(4)), message.updatedFields[key]]);
-					//console.log([  Number(key.slice(4))  ,  message.updatedFields[key]  ]);
-				}
-				if (keyval == "P") {
-					updateChart(udp);
-				}
-				else if (keyval == "E") {
-					updateChart2(udp);
-				}
-				else if (keyval == "T") {
-					updateChart3(udp);
-				}
-				else if (keyval == "S") {
-					updateChart4(udp);
-				}
-				else if (keyval == "B") {
-					updateChart5(udp);
+		socket.on(uid, (message) => {
+			// console.log(message);
+			let time = [];
+			let data = [];
+			if (message.data) {
+				Object.keys(message.data).forEach(el => {
+					if (el[0] == 't') {
+						time.push(message.data[el])
+					}
+					else {
+						data.push(message.data[el])
+					}
+				})
+				switch (message.type) {
+					case "Pressure": updateChart({ time: time, data: data }); break;
+					case "Temperature": updateChart2({ time: time, data: data }); break;
+					case "SPO2": updateChart3({ time: time, data: data }); break;
 				}
 			}
 		});
 
-
+		// var button = document.getElementById('event')
+		document.getElementById('baseline').addEventListener('click', function (msg) {
+			socket.emit('event', 'baseline')
+			console.log('baseline')
+		});
+		document.getElementById('occlusion').addEventListener('click', function (msg) {
+			socket.emit('event', 'occlusion')
+			console.log('occlusion')
+		});
+		document.getElementById('release').addEventListener('click', function (msg) {
+			socket.emit('event', 'release')
+			console.log('release')
+		});
 
 	</script>
 </body>

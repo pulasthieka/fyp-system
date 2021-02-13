@@ -12,6 +12,7 @@ WiFiMulti WiFiMulti;
 WebSocketsClient webSocket;
 
 bool wsconnected = false;
+unsigned long timeStamps;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
 const long interval = 250;
@@ -24,6 +25,13 @@ String SData = "[";
 String PData = "[";
 String P_data = "["; //to store ADC (P data) not a buffer
 long PAT = 0;        //for PAT signal
+
+//time Vars
+String Ttime = "[";
+String Etime = "[";
+String Btime = "[";
+String Stime = "[";
+String Ptime = "[";
 
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
@@ -132,14 +140,10 @@ void Send_data()
         readBuffer(Serial2);
       }
       previousMillis = currentMillis;
-      removeComma(P_data);
-      removeComma(TData);
-      removeComma(EData);
-      removeComma(BData);
-      removeComma(SData);
-      removeComma(PData);
+      removeCommas();
 
-      payload = "{\"hello\":" + PData + "], \"SData\":" + SData + "] , \"BData\" : " + BData + "], \"TData\" : " + TData + "], \"EData\" : " + EData + "] }";
+
+      payload = "{\"hello\":" + PData + "],\"Ptime\":" + Ptime + "], \"SData\":" + SData + "] ,\"Stime\":" + Stime + "], \"BData\" : " + BData + "],\"Btime\":" + Btime + "], \"TData\" : " + TData + "], \"Ttime\":" + Ttime + "],\"EData\" : " + EData + "],\"Etime\":" + Etime + "] }";
       Serial.println(payload);
       webSocket.sendTXT(payload);
       resetData();
@@ -147,7 +151,6 @@ void Send_data()
     }
   }
 }
-
 void readPressure()
 {
   P_data.concat(String(analogRead(34)) + ",");
@@ -158,6 +161,7 @@ void readBuffer(HardwareSerial buffReader)
 {
   boolean active = false;
   String *combineTo;
+  String *combineTime;
   while (buffReader.available())
   { //Reading buffer
     rx = buffReader.read();
@@ -169,27 +173,33 @@ void readBuffer(HardwareSerial buffReader)
         {
           active = false;
           *combineTo = *combineTo + ",";
+          *combineTime = *combineTime + String(millis()) + ",";
         }
         break;
       case 'T':
         active = true;
         combineTo = &TData;
+        combineTime = &Ttime;
         break;
       case 'E':
         active = true;
         combineTo = &EData;
+        combineTime = &Etime;
         break;
       case 'I':
         active = true;
         combineTo = &SData;
+        combineTime = &Stime;
         break;
       case 'B':
         active = true;
         combineTo = &BData;
+        combineTime = &Btime;
         break;
       case 'P':
         active = true;
         combineTo = &PData;
+        combineTime = &Ptime;
         break;
       default:
         if (active)
@@ -216,6 +226,20 @@ void removeComma(String &memRef)
     memRef.remove(memRef.length() - 1); //removing ending coma
   }
 }
+void removeCommas() {
+  removeComma(P_data);
+  removeComma(TData);
+  removeComma(EData);
+  removeComma(BData);
+  removeComma(SData);
+  removeComma(PData);
+
+  removeComma(Ttime);
+  removeComma(Etime);
+  removeComma(Btime);
+  removeComma(Stime);
+  removeComma(Ptime);
+}
 void resetData()
 {
   Serial.println("Resetting");
@@ -225,6 +249,11 @@ void resetData()
   SData = "[";
   BData = "[";
   PData = "[";
+  Ttime = "[";
+  Etime = "[";
+  Btime = "[";
+  Stime = "[";
+  Ptime = "[";
 }
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
