@@ -38,7 +38,8 @@ socket.on('connection', (client) => {
     console.log(msg);
     // msg = 'DinithiHemakumara';
     socket.emit(collectionName, 'connected to DB');
-    createDocsIfNotExists(msg);
+    createDocsIfNotExists(msg,prefixes1);
+    createDocsIfNotExists(msg,prefixes2);
     collectionName = msg;
     changeStream = openChangeStream(msg);
     changeStream.on('change', (change) => {
@@ -73,21 +74,43 @@ app.post('/save', function (req, res) {
 
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8011 });
+const wss2 = new WebSocket.Server({ port: 8012 });
 
 wss.on('connection', function connection(ws, req) {
   const ip = req.socket.remoteAddress;
-  console.log(ip);
+  console.log('Expremental',ip);
   lastTime = 0;
   ws.on('message', function incoming(message) {
     let msg;
     try {
       msg = JSON.parse(message);
-      processTransmission(msg);
+      processTransmission(msg,q,prefixes1);
     } catch {
       msg = message;
       console.log(msg);
     }
   });
+  
+
+  ws.send('acknowledge connection');
+});
+
+wss2.on('connection', function connection(ws, req) {
+  const ip = req.socket.remoteAddress;
+  // console.log('Control',ip);
+  // lastTime2 = 0;
+  ws.on('message', function incoming(message) {
+    let msg;
+    console.log(message)
+    try {
+      msg = JSON.parse(message);
+      processTransmission(msg,q2,prefixes2);
+    } catch {
+      msg = message;
+      console.log(msg);
+    }
+  });
+  
 
   ws.send('acknowledge connection');
 });
@@ -111,33 +134,45 @@ const q = queue(function (task, cb) {
       cb();
     }
   );
-  console.log('done');
+}, 1);
+const q2 = queue(function (task, cb) {
+  // console.log(task);
+  db.collection(collectionName).updateOne(
+    { _id: task.docname },
+    { $push: { [task.field]: { $each: task.processed_data }, ['timeStamps']: { $each: task.time } } },
+    // { upsert: true },
+    (err) => {
+      if (err) console.log('DB error:', err);
+      cb();
+    }
+  );
+  // console.log('done');
 }, 1);
 
-var prefixes = ['Pressure', 'SPO2', 'Temperature', 'Bioimpedance', 'Environment']; // PAT,ECG,Temp,SpO2,BioZ
-
+var prefixes1 = ['Pressure', 'SPO2', 'Temperature', 'Bioimpedance', 'Environment']; // PAT,ECG,Temp,SpO2,BioZ
+var prefixes2 = ['PressureC', 'SPO2C', 'TemperatureC', 'BioimpedanceC', 'EnvironmentC'];
 function openChangeStream(collection) {
   const taskCollection = db.collection(collection);
   const changeStream = taskCollection.watch();
   return changeStream;
 }
 
-function processTransmission(req) {
+function processTransmission(req,que,prefixes) {
   let Data_From_NodeMCU = req.hello;
   let S_data_server = req.SData;
   let T_data_server = req.TData;
   let B_data_server = req.BData;
   let E_data_server = req.EData;
-  //   nDate = Date.now();
+    // nDate = Date.now();
 
-  // console.log(req);
+  console.log(req);
 
   //["P","E","T","S","B"]
   data = [Data_From_NodeMCU, S_data_server, T_data_server, E_data_server, B_data_server];
   time = [req.Ptime, req.Stime, req.Ttime, req.Etime, req.Btime];
   //////////////Sending Data\\\\\\\\\\\\\\\\
 
-  for (var i = 0; i < prefixes.length - 1; i++) {
+  for (var i = 0; i < prefixes.length ; i++) {
     docname = collectionName + prefixes[i];
     if (data[i].length != 0) {
       // var field = prefixes[i];
@@ -146,18 +181,19 @@ function processTransmission(req) {
       lastTime = time[i][time[i].length - 1];
       const processed_data = data[i];
       //pusing to database one by one
-      q.push({ processed_data: processed_data, docname: prefixes[i], field: 'values', time: timeStamps });
+      que.push({ processed_data: processed_data, docname: prefixes[i], field: 'values', time: timeStamps });
     }
   }
 }
 var lastTime = 0;
+// var lastTime2 = 0;
 async function saveEvent(name) {
   db.collection(collectionName).updateOne({ _id: 'events' }, { $push: { [name]: lastTime } }, { upsert: true }, (err) => {
     if (err) console.log('DB error:', err);
   });
   console.log('Saved');
 }
-async function createDocsIfNotExists(collectionName) {
+async function createDocsIfNotExists(collectionName,prefixes) {
   delete mongoose.connection.models['Recording'];
   const recordingSchema = new mongoose.Schema(
     {

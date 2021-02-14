@@ -357,18 +357,20 @@
 			if (message.data) {
 				Object.keys(message.data).forEach(el => {
 					if (el[0] == 't') {
-						time.push(message.data[el])
+						time.push(Number(el.substr(11)))
+						
 					}
 					else {
 						data.push(message.data[el])
 					}
 				})
+				// console.log(time)
 				switch (message.type) {
 					case "Pressure": updateChart({ time: time, data: data }); break;
 					case "Temperature": updateChart2({ time: time, data: data }); break;
 					case "SPO2": updateChart3({ time: time, data: data }); break;
 					case "Bioimpedance": updateChart4({ time: time, data: data }); break;
-					case "Environment": updateChart5({ time: time, data: data }); break;
+					case "SPO2C": updateChart5({ time: time, data: data }); break;
 				}
 			}
 		});

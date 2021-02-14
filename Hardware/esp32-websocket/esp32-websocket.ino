@@ -37,8 +37,8 @@ String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
 const char* ssid = "MiA2";
-const char* password = "CPNbims98";
-const char* ip = "192.168.43.238";
+const char* password = "12345678";
+const char* ip = "192.168.43.92";
 const int port = 8011;
 
 //WiFiServer server(80);
@@ -186,12 +186,12 @@ void readBuffer(HardwareSerial buffReader)
         combineTo = &EData;
         combineTime = &Etime;
         break;
-      case 'I':
+      case 'S':
         active = true;
         combineTo = &SData;
         combineTime = &Stime;
         break;
-      case 'B':
+      case 'R':
         active = true;
         combineTo = &BData;
         combineTime = &Btime;
