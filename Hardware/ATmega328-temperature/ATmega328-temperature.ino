@@ -25,7 +25,7 @@ void loop() {
   /* refer to page 28 of datasheet
     https://www.ti.com/lit/ds/symlink/ads1115.pdf?ts=1611997309467&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FADS1115%253FkeyMatch%253DADS1115%2526tisearch%253DSearch-EN-everything%2526usecase%253DGPN
   */
-  writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
+  writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100010110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
   SavedTime = micros();
   requestTemp(BodyTempAdd);
   requestTemp(EnvTempAdd);
@@ -34,15 +34,15 @@ void loop() {
   }
   PAT = readRegister(ADS1115_ADDRESS, ADS1015_REG_POINTER_CONVERT);
   Serial.print("P" + String(PAT) + 'X');
-  writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
+  writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100010110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
   
-  
+  delay(6);
   temperatureC=getTemp(BodyTempAdd);
   Serial.print("T" + String(temperatureC) + 'X');
   temperatureC=getTemp(EnvTempAdd);
   Serial.print("E" + String(temperatureC) + 'X');
   SavedTime = micros();
-  while (SavedTime - micros() < 4746) {
+  while (SavedTime - micros() < 4923) {
     delayMicroseconds(1); //ADS1115_CONVERSION_DELAY - STS_Read_Time
   }
   PAT = readRegister(ADS1115_ADDRESS, ADS1015_REG_POINTER_CONVERT);
