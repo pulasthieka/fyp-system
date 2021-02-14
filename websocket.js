@@ -114,7 +114,7 @@ const q = queue(function (task, cb) {
   console.log('done');
 }, 1);
 
-var prefixes = ['Pressure', 'SPO2', 'Temperature', 'Bioimpedance']; // PAT,ECG,Temp,SpO2,BioZ
+var prefixes = ['Pressure', 'SPO2', 'Temperature', 'Bioimpedance', 'Environment']; // PAT,ECG,Temp,SpO2,BioZ
 
 function openChangeStream(collection) {
   const taskCollection = db.collection(collection);
@@ -130,11 +130,11 @@ function processTransmission(req) {
   let E_data_server = req.EData;
   //   nDate = Date.now();
 
-  console.log(req);
+  // console.log(req);
 
   //["P","E","T","S","B"]
-  data = [Data_From_NodeMCU, E_data_server, T_data_server, S_data_server, B_data_server];
-  time = [req.Ptime, req.Etime, req.Ttime, req.Stime, req.Btime];
+  data = [Data_From_NodeMCU, S_data_server, T_data_server, E_data_server, B_data_server];
+  time = [req.Ptime, req.Stime, req.Ttime, req.Etime, req.Btime];
   //////////////Sending Data\\\\\\\\\\\\\\\\
 
   for (var i = 0; i < prefixes.length - 1; i++) {

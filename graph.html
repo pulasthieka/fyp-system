@@ -272,11 +272,11 @@
 		};
 
 		var updateChart3 = function (upd) {
-			count = upd.length;
+			count = upd.time.length;
 			for (var j = 0; j < count; j++) {
 
 				dps3.push({
-					x: upd[j][0], y: upd[j][1]
+					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_2,
 					//  y: upd[j].value
 				});
@@ -296,11 +296,11 @@
 		};
 
 		var updateChart4 = function (upd) {
-			count = upd.length;
+			count = upd.time.length;
 			for (var j = 0; j < count; j++) {
 
 				dps4.push({
-					x: upd[j][0], y: upd[j][1]
+					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_2,
 					//  y: upd[j].value
 				});
@@ -320,11 +320,11 @@
 		};
 
 		var updateChart5 = function (upd) {
-			count = upd.length;
+			count = upd.time.length;
 			for (var j = 0; j < count; j++) {
 
 				dps5.push({
-					x: upd[j][0], y: upd[j][1]
+					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_2,
 					//  y: upd[j].value
 				});
@@ -367,6 +367,8 @@
 					case "Pressure": updateChart({ time: time, data: data }); break;
 					case "Temperature": updateChart2({ time: time, data: data }); break;
 					case "SPO2": updateChart3({ time: time, data: data }); break;
+					case "Bioimpedance": updateChart4({ time: time, data: data }); break;
+					case "Environment": updateChart5({ time: time, data: data }); break;
 				}
 			}
 		});
