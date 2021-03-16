@@ -15,7 +15,7 @@ bool wsconnected = false;
 unsigned long timeStamps;
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
-const long interval = 250;
+const long interval = 100;
 
 // DATA Vars
 String TData = "[";
@@ -23,6 +23,11 @@ String EData = "[";
 String BData = "[";
 String SData = "[";
 String PData = "[";
+String TCData = "[";
+String ECData = "[";
+String BCData = "[";
+String SCData = "[";
+String PCData = "[";
 String P_data = "["; //to store ADC (P data) not a buffer
 long PAT = 0;        //for PAT signal
 
@@ -32,13 +37,17 @@ String Etime = "[";
 String Btime = "[";
 String Stime = "[";
 String Ptime = "[";
-
+String TCtime = "[";
+String ECtime = "[";
+String BCtime = "[";
+String SCtime = "[";
+String PCtime = "[";
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char* ssid = "MiA2";
-const char* password = "12345678";
-const char* ip = "192.168.43.92";
+const char* ssid = "CPN";
+const char* password = "CPNbims98";
+const char* ip = "192.168.137.1";
 const int port = 8011;
 
 //WiFiServer server(80);
@@ -73,8 +82,8 @@ void setup()
   //  pinMode(22, INPUT);
   //Serial com
   Serial.begin(115200);
-  MySerial1.begin(2000000, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
-  Serial2.begin(2000000);
+  MySerial1.begin(115200, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
+  Serial2.begin(115200);
   //Setting Serial Buffer size
   MySerial1.setRxBufferSize(1024);
   Serial2.setRxBufferSize(1024);
@@ -99,6 +108,8 @@ void setup()
   Serial.println("Server started at...");
   Serial.println(WiFi.localIP());
   // server address, port and URL
+  Serial.print("Connecting to IP:");
+  Serial.println(ip);
   webSocket.begin(ip, port, "/");
 
   // event handler
@@ -143,7 +154,12 @@ void Send_data()
       removeCommas();
 
 
-      payload = "{\"hello\":" + PData + "],\"Ptime\":" + Ptime + "], \"SData\":" + SData + "] ,\"Stime\":" + Stime + "], \"BData\" : " + BData + "],\"Btime\":" + Btime + "], \"TData\" : " + TData + "], \"Ttime\":" + Ttime + "],\"EData\" : " + EData + "],\"Etime\":" + Etime + "] }";
+      payload = "{\"PData\":" + PData + "], \"SData\":" + SData + "] ,\"Stime\":" + Stime + "], \"BData\" : " + BData + "],\"TData\" : " + TData + "], \"EData\" : " + EData + "],\"PCData\":" + PCData +
+      "], \"SCData\":" + SCData + "] , \"BCData\" : " + BCData + "], \"TCData\" : " + TCData + "], \"ECData\" : " + ECData + "]}";
+//       payload = "{\"PData\":" + PData + "],\"Ptime\":" + Ptime + "], \"SData\":" + SData + "] ,\"Stime\":" + Stime + "], \"BData\" : " + BData + "],\"Btime\":" +
+//                Btime + "], \"TData\" : " + TData + "], \"Ttime\":" + Ttime + "],\"EData\" : " + EData + "],\"Etime\":" + Etime +
+//                "],\"PCData\":" + PCData + "],\"PCtime\":" + PCtime + "], \"SCData\":" + SCData + "] ,\"SCtime\":" + SCtime + "], \"BCData\" : " + BCData + "],\"BCtime\":" +
+//                BCtime + "], \"TCData\" : " + TCData + "], \"TCtime\":" + TCtime + "],\"ECData\" : " + ECData + "],\"ECtime\":" + ECtime + "] }";
       Serial.println(payload);
       webSocket.sendTXT(payload);
       resetData();
@@ -165,7 +181,7 @@ void readBuffer(HardwareSerial buffReader)
   while (buffReader.available())
   { //Reading buffer
     rx = buffReader.read();
-    //    Serial.print(rx);
+    Serial.print(rx);
     switch (rx)
     {
       case 'X':
@@ -173,7 +189,7 @@ void readBuffer(HardwareSerial buffReader)
         {
           active = false;
           *combineTo = *combineTo + ",";
-          *combineTime = *combineTime + String(millis()) + ",";
+//                    *combineTime = *combineTime + String(millis()) + ",";
         }
         break;
       case 'T':
@@ -184,9 +200,9 @@ void readBuffer(HardwareSerial buffReader)
       case 'E':
         active = true;
         combineTo = &EData;
-        combineTime = &Etime;
+        combineTime = &Ttime;
         break;
-      case 'S':
+      case 'I':
         active = true;
         combineTo = &SData;
         combineTime = &Stime;
@@ -201,10 +217,32 @@ void readBuffer(HardwareSerial buffReader)
         combineTo = &PData;
         combineTime = &Ptime;
         break;
+//      case 't':
+//        active = true;
+//        combineTo = &TCData;
+//        break;
+//      case 'e':
+//        active = true;
+//        combineTo = &ECData;
+//        break;
+//      case 'i':
+//        active = true;
+//        combineTo = &SCData;
+//        break;
+//      case 'r':
+//        active = true;
+//        combineTo = &BCData;
+//        break;
+//      case 'p':
+//        active = true;
+//        combineTo = &PCData;
+//        break;
+
       default:
         if (active)
         {
           *combineTo = *combineTo + rx;
+
         }
     }
   }
@@ -233,12 +271,17 @@ void removeCommas() {
   removeComma(BData);
   removeComma(SData);
   removeComma(PData);
-
-  removeComma(Ttime);
+    removeComma(Ttime);
   removeComma(Etime);
   removeComma(Btime);
   removeComma(Stime);
   removeComma(Ptime);
+
+  removeComma(TCData);
+  removeComma(ECData);
+  removeComma(BCData);
+  removeComma(SCData);
+  removeComma(PCData);
 }
 void resetData()
 {
@@ -249,11 +292,19 @@ void resetData()
   SData = "[";
   BData = "[";
   PData = "[";
-  Ttime = "[";
+    Ttime = "[";
   Etime = "[";
   Btime = "[";
   Stime = "[";
   Ptime = "[";
+ 
+  //  Control arm
+  TCData = "[";
+  ECData = "[";
+  SCData = "[";
+  BCData = "[";
+  PCData = "[";
+
 }
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
@@ -295,7 +346,7 @@ void configureDisplay()
 {
   display.clearDisplay();
   display.setCursor(0, 0); // Start at to  p-left corner
-  display.setTextSize(2);  // Draw 2X-scale text
+  display.setTextSize(1);  // Draw 2X-scale text
   display.setTextColor(SSD1306_WHITE);
 }
 void Index(void)
@@ -333,9 +384,9 @@ void ConnectingNode(void)
   display.println("Connected to WiFi!");
   display.println("Connecting to NodeJS");
   display.println("Target IP:");
-  //    display.println(String(nodejs_ip));
-  //    display.println("Target port:");
-  //    display.println(String(nodejs_port));
+  display.println(String(ip));
+  display.println("Target port:");
+  display.println(String(port));
   display.display();
   //  delay(1000);
 }

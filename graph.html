@@ -248,7 +248,7 @@
 				xVal_1++;
 			}
 
-			if (dps.length > dataLength+100) {
+			if (dps.length > dataLength + 100) {
 				dps.splice(0, count);
 			}
 			//reset the range of Axis X on selecting the reset option
@@ -417,7 +417,7 @@
 				Object.keys(message.data).forEach(el => {
 					if (el[0] == 't') {
 						time.push(Number(el.substr(11)))
-						
+
 					}
 					else {
 						data.push(message.data[el])
@@ -425,13 +425,13 @@
 				})
 				// console.log(time)
 				switch (message.type) {
-					case "Pressure": updateChart({ time: time, data: data }); break;
-					case "Temperature": updateChart2({ time: time, data: data }); break;
-					case "SPO2": updateChart3({ time: time, data: data }); break;
-					case "Bioimpedance": updateChart4({ time: time, data: data }); break;
-					
-					case "SPO2C": updateChart5({ time: time, data: data }); break;
-					case "Environment": updateChart6({ time: time, data: data }); break;
+					case "PData": updateChart({ time: time, data: data }); break;
+					case "TData": updateChart2({ time: time, data: data }); break;
+					case "SData": updateChart3({ time: time, data: data }); break;
+					case "BData": updateChart4({ time: time, data: data }); break;
+
+					case "IData": updateChart5({ time: time, data: data }); break;
+					case "EData": updateChart6({ time: time, data: data }); break;
 				}
 			}
 		});

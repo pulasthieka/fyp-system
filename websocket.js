@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var cors = require('cors');
 
+var times = {};
 //mongoose.connect('mongodb://localhost/testdb');
 config = {
   DB: 'mongodb://localhost:27017/tryone?replicaSet=rs',
@@ -38,8 +39,8 @@ socket.on('connection', (client) => {
     console.log(msg);
     // msg = 'DinithiHemakumara';
     socket.emit(collectionName, 'connected to DB');
-    createDocsIfNotExists(msg,prefixes1);
-    createDocsIfNotExists(msg,prefixes2);
+    createDocsIfNotExists(msg, prefixes1);
+    createDocsIfNotExists(msg, prefixes2);
     collectionName = msg;
     changeStream = openChangeStream(msg);
     changeStream.on('change', (change) => {
@@ -78,19 +79,18 @@ const wss2 = new WebSocket.Server({ port: 8012 });
 
 wss.on('connection', function connection(ws, req) {
   const ip = req.socket.remoteAddress;
-  console.log('Expremental',ip);
+  console.log('Expremental', ip);
   lastTime = 0;
   ws.on('message', function incoming(message) {
     let msg;
     try {
       msg = JSON.parse(message);
-      processTransmission(msg,q,prefixes1);
+      processTransmission(msg, q, prefixes1);
     } catch {
       msg = message;
       console.log(msg);
     }
   });
-  
 
   ws.send('acknowledge connection');
 });
@@ -101,16 +101,15 @@ wss2.on('connection', function connection(ws, req) {
   // lastTime2 = 0;
   ws.on('message', function incoming(message) {
     let msg;
-    console.log(message)
+    console.log(message);
     try {
       msg = JSON.parse(message);
-      processTransmission(msg,q2,prefixes2);
+      processTransmission(msg, q2, prefixes2);
     } catch {
       msg = message;
       console.log(msg);
     }
   });
-  
 
   ws.send('acknowledge connection');
 });
@@ -149,7 +148,7 @@ const q2 = queue(function (task, cb) {
   // console.log('done');
 }, 1);
 
-var prefixes1 = ['Pressure', 'SPO2', 'Temperature', 'Bioimpedance', 'Environment']; // PAT,ECG,Temp,SpO2,BioZ
+var prefixes1 = ['PData', 'SData', 'TData', 'BData', 'EData']; // PAT,ECG,Temp,SpO2,BioZ
 var prefixes2 = ['PressureC', 'SPO2C', 'TemperatureC', 'BioimpedanceC', 'EnvironmentC'];
 function openChangeStream(collection) {
   const taskCollection = db.collection(collection);
@@ -157,33 +156,23 @@ function openChangeStream(collection) {
   return changeStream;
 }
 
-function processTransmission(req,que,prefixes) {
-  let Data_From_NodeMCU = req.hello;
-  let S_data_server = req.SData;
-  let T_data_server = req.TData;
-  let B_data_server = req.BData;
-  let E_data_server = req.EData;
-    // nDate = Date.now();
-
-  console.log(req);
-
-  //["P","E","T","S","B"]
-  data = [Data_From_NodeMCU, S_data_server, T_data_server, E_data_server, B_data_server];
-  time = [req.Ptime, req.Stime, req.Ttime, req.Etime, req.Btime];
+function processTransmission(req, que) {
+  console.log('Process Transmission', req);
   //////////////Sending Data\\\\\\\\\\\\\\\\
-
-  for (var i = 0; i < prefixes.length ; i++) {
-    docname = collectionName + prefixes[i];
-    if (data[i].length != 0) {
-      // var field = prefixes[i];
-      // var time = prefixes[i];
-      const timeStamps = time[i];
-      lastTime = time[i][time[i].length - 1];
-      const processed_data = data[i];
+  Object.keys(req).forEach((key) => {
+    docname = collectionName + key.toString();
+    if (req[key].length != 0) {
+      const processed_data = req[key];
+      const d = new Date().getTime();
+      var i;
+      var time = [];
+      for (i = 0; i < req[key].length; i++) {
+        time.push(d.toString + i.toString);
+      }
       //pusing to database one by one
-      que.push({ processed_data: processed_data, docname: prefixes[i], field: 'values', time: timeStamps });
+      que.push({ processed_data: processed_data, docname: key.toString(), field: 'values', time: time });
     }
-  }
+  });
 }
 var lastTime = 0;
 // var lastTime2 = 0;
@@ -193,7 +182,7 @@ async function saveEvent(name) {
   });
   console.log('Saved');
 }
-async function createDocsIfNotExists(collectionName,prefixes) {
+async function createDocsIfNotExists(collectionName, prefixes) {
   delete mongoose.connection.models['Recording'];
   const recordingSchema = new mongoose.Schema(
     {
