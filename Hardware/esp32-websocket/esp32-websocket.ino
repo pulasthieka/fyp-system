@@ -45,9 +45,9 @@ String PCtime = "[";
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char* ssid = "CPN";
-const char* password = "CPNbims98";
-const char* ip = "192.168.137.1";
+const char* ssid = "Dialog 4G 055";
+const char* password = "6051A6D3";
+const char* ip = "192.168.8.184";
 const int port = 8011;
 
 //WiFiServer server(80);
@@ -173,11 +173,13 @@ void readPressure()
   delayMicroseconds(10);
 }
 // buffer reading function
+boolean active = false;
+String *combineTo;
+String *combineTime;
+String value = "";
 void readBuffer(HardwareSerial buffReader)
 {
-  boolean active = false;
-  String *combineTo;
-  String *combineTime;
+    
   while (buffReader.available())
   { //Reading buffer
     rx = buffReader.read();
@@ -188,7 +190,8 @@ void readBuffer(HardwareSerial buffReader)
         if (active)
         {
           active = false;
-          *combineTo = *combineTo + ",";
+          *combineTo = *combineTo + value + ",";
+          value = "";
 //                    *combineTime = *combineTime + String(millis()) + ",";
         }
         break;
@@ -239,9 +242,9 @@ void readBuffer(HardwareSerial buffReader)
 //        break;
 
       default:
-        if (active)
+        if (active && isDigit(rx))
         {
-          *combineTo = *combineTo + rx;
+          value = value + rx;
 
         }
     }
