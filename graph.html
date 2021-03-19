@@ -4,9 +4,6 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Database connected to CanvasJS</title>
-	<script type="text/javascript"
-		src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=SkZz3Mmtd2MHBUKiUx23b_YBneLU5tg4IgX6RRUVdngQG7km0MppKLT72gqCwc1eruBIs33i6PX_sEzYK4J3GLTBNhySO1Bv5fM2DUZ1MMq5KbVV52ldyOHQe7MFGy2MS-8UVf9BRw6-El02zfiD5F6nNEmJedIhmL3rvXrPEpjpPmwHZoqDWbgTx9Ed51EhL06jQ1hfqMcDt-zHBquF2R8YDo3DREVamnxNQRSFDIRZ8Ztc8Ul_dA11E_A71_3o4pTxLj3Flt6FS-l7Qlbtfu_SmS0ymIj3sGrgwZHMxqhFIisKzR7gIqrU3k4InIGX4LjEsXI9Uuj5OnVasKb6vhggpZm5c2ugkCP8TpDH8a5eS1zRbuzFC-a_CY4NtttaMheVhdhOn1nxbdsJMnUWuRU-NhffZf6c8VhxfLJTxZJIiIR892ibiFRE5ryqEz8t1mnaT70R99uy-qqqbFjJ7mgAU5-y3byg-vIPBWHBWo6vI-jTETsFxKuWoghr8v4qzGfvjLAZEfZ0T2bC7nmqe3jU9IXI1jhXOf04brR1D7u-XGUHaQYrVlIiRWQO_tvRsW_3zUGq7jjqSHT4paHEghZZLn6ITi47meFYV3B25SntP9wt77L24Y1h1JlC9rnYxOQhsZzwvQpNbwJfqpUbKywH_HTEtytEM2rLwMJkwDE"
-		charset="UTF-8"></script>
 	<script src="socket.io.js"></script>
 	<script src="jquery-3.5.1.js"></script>
 	<script src="canvasjs.min.js"></script>
@@ -36,7 +33,7 @@
 		var updateRange = 0;
 		var resetFlag = false;
 		var updateInterval = 100;
-		var dataLength = 200; // number of dataPoints visible at any point
+		var dataLength = 1000; // number of dataPoints visible at any point
 		var cnt = 0;
 
 		var socket = io('http://localhost:90');//socket connection
@@ -429,7 +426,6 @@
 					case "TData": updateChart2({ time: time, data: data }); break;
 					case "SData": updateChart3({ time: time, data: data }); break;
 					case "BData": updateChart4({ time: time, data: data }); break;
-
 					case "IData": updateChart5({ time: time, data: data }); break;
 					case "EData": updateChart6({ time: time, data: data }); break;
 				}

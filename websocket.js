@@ -32,19 +32,19 @@ let collectionName = 'default';
 socket.on('connection', (client) => {
   let changeStream;
   client.on('event', (msg) => {
-    console.log(msg);
+    //console.log(msg);
     saveEvent(msg);
   });
   client.on('db', (msg) => {
-    console.log(msg);
+    //console.log(msg);
     // msg = 'DinithiHemakumara';
     socket.emit(collectionName, 'connected to DB');
     createDocsIfNotExists(msg, prefixes1);
-    createDocsIfNotExists(msg, prefixes2);
+    // createDocsIfNotExists(msg, prefixes2);
     collectionName = msg;
     changeStream = openChangeStream(msg);
     changeStream.on('change', (change) => {
-      // console.log(change.updateDescription.updatedFields);
+      //console.log(change.updateDescription.updatedFields);
       // {type:change.documentKey._id, data:change.updateDescription.updatedValues}
       if (change.operationType === 'update') {
         socket.emit(collectionName, { type: change.documentKey._id, data: change.updateDescription.updatedFields });
@@ -67,7 +67,7 @@ db.once('open', () => {
 });
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/graph.html');
+  res.sendFile(__dirname + '/plots_page.html');
 });
 app.post('/save', function (req, res) {
   console.log(req.body);
@@ -101,7 +101,7 @@ wss2.on('connection', function connection(ws, req) {
   // lastTime2 = 0;
   ws.on('message', function incoming(message) {
     let msg;
-    console.log(message);
+    //console.log(message);
     try {
       msg = JSON.parse(message);
       processTransmission(msg, q2, prefixes2);
@@ -148,7 +148,7 @@ const q2 = queue(function (task, cb) {
   // console.log('done');
 }, 1);
 
-var prefixes1 = ['PData', 'SData', 'TData', 'BData', 'EData']; // PAT,ECG,Temp,SpO2,BioZ
+var prefixes1 = ['PData', 'SData', 'TData', 'BData', 'EData','PCData', 'SCData', 'TCData', 'BCData' ]; // PAT,ECG,Temp,SpO2,BioZ
 var prefixes2 = ['PressureC', 'SPO2C', 'TemperatureC', 'BioimpedanceC', 'EnvironmentC'];
 function openChangeStream(collection) {
   const taskCollection = db.collection(collection);
@@ -157,7 +157,7 @@ function openChangeStream(collection) {
 }
 
 function processTransmission(req, que) {
-  console.log('Process Transmission', req);
+  //console.log('Process Transmission', req);
   //////////////Sending Data\\\\\\\\\\\\\\\\
   Object.keys(req).forEach((key) => {
     docname = collectionName + key.toString();
@@ -167,7 +167,7 @@ function processTransmission(req, que) {
       var i;
       var time = [];
       for (i = 0; i < req[key].length; i++) {
-        time.push(d.toString + i.toString);
+        time.push(d.toString + (i/10000).toString);
       }
       //pusing to database one by one
       que.push({ processed_data: processed_data, docname: key.toString(), field: 'values', time: time });
