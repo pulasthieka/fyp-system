@@ -24,7 +24,7 @@ void loop() {
   //  requestTemp(BodyTempAdd);
   if ( requestTemp(EnvTempAdd)) {
     temperatureC = getTemp(EnvTempAdd);
-    SerialPlot("T", 100*temperatureC);
+    SerialPlot("t", 100*temperatureC);
     message = message + "\"TData\":[" + temperatureC + "],\"Ttime\":[" + millis() + "],";
   }
 
@@ -32,7 +32,7 @@ void loop() {
   //  SavedTime = micros();
   if (isAvailablePAT) {
     PAT = readRegister(ADS1115_ADDRESS, ADS1015_REG_POINTER_CONVERT);
-    SerialPlot("P", PAT);
+    SerialPlot("p", PAT);
     writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
     message = message + "\"hello\":[" + PAT + "],\"Ptime\":[" + millis() + "],";
   }
@@ -43,8 +43,8 @@ void loop() {
   I2CreadBytes(MAX30100_ADDRESS, MAX30100_FIFO_DATA, &temp[0], 4);  // Read four times from the FIFO
   long IR = (temp[0] << 8) | temp[1];  // Combine values to get the actual number
   long RED = (temp[2] << 8) | temp[3]; // Combine values to get the actual number
-  SerialPlot("I", RED );
-  SerialPlot("R", IR );
+  SerialPlot("i", RED );
+  SerialPlot("r", IR );
   message = message + "\"SData\":[" + RED + "],\"Stime\":[" + millis() + "],";
   message = message + "\"BData\":[" + IR + "],\"Btime\":[" + millis() + "],";
   ////getimp(0x18, 0x6A, 0x73,'R');

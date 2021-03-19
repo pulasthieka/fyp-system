@@ -1,7 +1,7 @@
 byte byte1, byte2, byte3;
 float tC;
 //Functions for temperature sensors
-boolw requestTemp(int address) {
+bool requestTemp(int address) {
   // set up for single shot mode / clock stretching /.5/sec max frequency
   Wire.beginTransmission(address);
   //start the communication with IC  with the address
