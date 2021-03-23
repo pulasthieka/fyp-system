@@ -206,8 +206,9 @@ input:checked + .slider:before {
 		var socket = io('http://localhost:90');//socket connection
         var dps1=[],dps2=[],dps3=[],dps4=[];
 		var dps1_c=[],dps2_c=[],dps3_c=[],dps4_c=[];
+		var dps_e;
         var charts=[chart1,chart2,chart3,chart4];
-        var dps=[dps1,dps2,dps3,dps4];
+        //var dps=[dps1,dps2,dps3,dps4];
         var updateInterval=500;//speed of update half a second
         var dataLength=100;//number of datapoints visible at a time
         var cnt=0;
@@ -378,6 +379,10 @@ input:checked + .slider:before {
 					type:"line",
 					dataPoints: dps2_c,
 				},
+				{
+					type:"line",
+					dataPoints: dps_e,
+				},
 			],
 		};
         //create chart
@@ -498,11 +503,11 @@ input:checked + .slider:before {
 		chart3.render();      
 		             
         //define updateChart
-        var updateChart3 = function (upd) {
+        var updateChart3 = function (upd,dps) {
             count = upd.time.length;
 			//count = 100;
 			for (var j = 0; j < count; j++) {
-				dps3.push({
+				dps.push({
 					x: upd.time[j], y: upd.data[j]
 					//  x: upd[j].time,//xVal_2,
 					//  y: upd[j].value
@@ -694,12 +699,12 @@ input:checked + .slider:before {
 					case "TData": updateChart2({ time: time, data: data },dps2); break;
 					case "SData": updateChart3({ time: time, data: data },dps3); break;
 					case "BData": updateChart4({ time: time, data: data },dps4); break;
-					case "IData": updateChart5({ time: time, data: data }); break;
-					case "EData": updateChart6({ time: time, data: data }); break;
-					case "PCData": updateChart1({ time: time, data: data },dps1); break;
-					case "TCData": updateChart2({ time: time, data: data },dps2); break;
-					case "SCData": updateChart3({ time: time, data: data },dps3); break;
-					case "BCData": updateChart4({ time: time, data: data },dps4); break;
+					//case "IData": updateChart5({ time: time, data: data }); break;
+					case "EData": updateChart2({ time: time, data: data },dps_e); break;
+					case "PCData": updateChart1({ time: time, data: data },dps1_c); break;
+					case "TCData": updateChart2({ time: time, data: data },dps2_c); break;
+					case "SCData": updateChart3({ time: time, data: data },dps3_c); break;
+					case "BCData": updateChart4({ time: time, data: data },dps4_c); break;
 				}
 			}
 		});
