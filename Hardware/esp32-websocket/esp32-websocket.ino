@@ -47,7 +47,7 @@ char rx = 'X'; //to read first byte from serial buffer
 
 const char* ssid = "Dialog 4G 055";
 const char* password = "6051A6D3";
-const char* ip = "192.168.8.184";
+const char* ip = "192.168.8.128";
 const int port = 8011;
 
 //WiFiServer server(80);
@@ -190,7 +190,7 @@ void readBuffer(HardwareSerial buffReader)
         if (active)
         {
           active = false;
-          *combineTo = *combineTo + value + ",";
+          *combineTo = *combineTo + String(value.toInt()) + ",";
           value = "";
 //                    *combineTime = *combineTime + String(millis()) + ",";
         }
@@ -220,26 +220,26 @@ void readBuffer(HardwareSerial buffReader)
         combineTo = &PData;
         combineTime = &Ptime;
         break;
-//      case 't':
-//        active = true;
-//        combineTo = &TCData;
-//        break;
-//      case 'e':
-//        active = true;
-//        combineTo = &ECData;
-//        break;
-//      case 'i':
-//        active = true;
-//        combineTo = &SCData;
-//        break;
-//      case 'r':
-//        active = true;
-//        combineTo = &BCData;
-//        break;
-//      case 'p':
-//        active = true;
-//        combineTo = &PCData;
-//        break;
+      case 't':
+        active = true;
+        combineTo = &TCData;
+        break;
+      case 'e':
+        active = true;
+        combineTo = &ECData;
+        break;
+      case 'i':
+        active = true;
+        combineTo = &SCData;
+        break;
+      case 'r':
+        active = true;
+        combineTo = &BCData;
+        break;
+      case 'p':
+        active = true;
+        combineTo = &PCData;
+        break;
 
       default:
         if (active && isDigit(rx))
