@@ -35,15 +35,15 @@ void loop()
   //Can use checkFrequencySweepOver() function to verify if frequency sweep is over
   requestImp(startFrequency, numberOfIncremrnts, incrementFrequency, settlingCycles);
   waitTillImpReady(); //can also use checkImpReady() to check if measurement is ready
-  printImp(); //Getting the sample from AD5933 and serial printing
+  printImp("W","w"); //Getting the sample from AD5933 and serial printing
   waitTillImpReady();
-  printImp();
+  printImp("Y","y");
   waitTillImpReady();
-  printImp();
+  printImp("Z","z");
   waitTillImpReady();
-  printImp();
+  printImp("A","a");
   waitTillImpReady();
-  printImp();
+  printImp("C","c");
 }
 
 long convertToMachineFrequency(unsigned int frequencyValue) {
@@ -101,14 +101,15 @@ void waitTillImpReady(void) {
   }
 }
 
-void printImp(void){
+void printImp(char realChar, char imgChar){
   waitTillImpReady(); //Making sure we don't get invalid data
   real = ADread(0x94) << 7; //looks kinda funny but simple way didn't work (at least in my arduino
   real = real << 1 | ADread(0x95);
   img = ADread(0x96) << 7;
   img = img << 1 | ADread(0x97);
   ADwrite(0x80, 0b00110001); //Increment frequency
-  Serial.println("Frequncy : "+String(currentFrequency)+ "Hz, Real : "+String(real) + ", Imaginary : " + String(img));
+//  Serial.println("Frequncy : "+String(currentFrequency)+ "Hz, Real : "+String(real) + ", Imaginary : " + String(img));
+Serial.print(realChar+ String(real) + "X"+ imgChar + String(img) + "X");
   currentFrequency+=incrementFrequency;
   }
 
