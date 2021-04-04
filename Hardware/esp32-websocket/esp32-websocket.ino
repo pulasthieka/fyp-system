@@ -29,7 +29,7 @@ unsigned long previousMillis = 0;
 const long interval = 100;
 
 int capacity = 1024;
-const char json[] = "{\"PData\":[],\"SData\":[],\"BData\":[],\"TData\":[],\"EData\":[],\"PCData\":[],\"SCData\":[],\"BCData\":[],\"TCData\":[],\"ECData\":[]}";
+const char json[] = "{\"PData\":[],\"SData\":[],\"BData\":[],\"TData\":[],\"EData\":[],\"PCData\":[],\"SCData\":[],\"BCData\":[],\"TCData\":[],\"ECData\":[],\"WData\":[],\"WCData\":[],\"CData\":[],\"CCData\":[],\"YData\":[],\"YCData\":[],\"ZData\":[],\"ZCData\":[],\"AData\":[],\"ACData\":[],\"FData\":[],\"FCData\":[],\"GData\":[],\"GCData\":[],\"HData\":[],\"HCData\":[],\"JData\":[],\"JCData\":[],\"KData\":[],\"KCData\":[]}";
 DynamicJsonDocument root(capacity);
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
@@ -51,8 +51,8 @@ void setup()
   displayWelcomeMessage();
 
   Serial.begin(115200);
-  MySerial1.begin(115200, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
-  Serial2.begin(115200);
+  MySerial1.begin(2000000, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
+  Serial2.begin(2000000);
 
   MySerial1.setRxBufferSize(1024); //Setting Serial Buffer size for 1
   Serial2.setRxBufferSize(1024); //Setting Serial Buffer size for 2
@@ -76,7 +76,7 @@ void setup()
   webSocket.onEvent(webSocketEvent);
   //  webSocket.setAuthorization("user", "Password"); // use HTTP Basic Authorization this is optional remove if not needed
   webSocket.setReconnectInterval(5000); // try ever 5000 again if connection has failed
-  
+
   deserializeJson(root, json); // configure JSON object
 }
 
@@ -103,7 +103,13 @@ void Send_data()
         readBuffer(Serial2, root);
       }
       previousMillis = currentMillis;
-
+//      while (currentMillis - previousMillis < 2*interval)
+//      {
+//        currentMillis = millis();
+//        delayMicroseconds(5);
+//        readBuffer(Serial2, root);
+//      }
+//      previousMillis = currentMillis;
       payload = "";
       serializeJson(root, Serial);//print to serial port
       serializeJson(root, payload);
@@ -125,11 +131,13 @@ String value = "";
 
 void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
 {
+  //  while (!active) {
+  //Serial.print(".2!");
 
   while (buffReader.available())
   { //Reading buffer
     rx = buffReader.read();
-    Serial.print(rx);
+//    Serial.print(rx);
     switch (rx)
     {
       case 'X':
@@ -139,6 +147,7 @@ void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
           JsonArray current = doc[combineTo];
           current.add(value.toInt());
           value = "";
+          return;
         }
         break;
       case 'T':
@@ -153,7 +162,7 @@ void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
         active = true;
         combineTo = "SData";
         break;
-      case 'c':
+      case 'B':
         active = true;
         combineTo = "BData";
         break;
@@ -181,7 +190,86 @@ void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
         active = true;
         combineTo = "PCData";
         break;
-
+      case 'W':
+        active = true;
+        combineTo = "WData";
+        break;
+      case 'w':
+        active = true;
+        combineTo = "WCData";
+        break;
+      case 'Y':
+        active = true;
+        combineTo = "YData";
+        break;
+      case 'y':
+        active = true;
+        combineTo = "YCData";
+        break;
+      case 'Z':
+        active = true;
+        combineTo = "ZData";
+        break;
+      case 'z':
+        active = true;
+        combineTo = "ZCData";
+        break;
+      case 'A':
+        active = true;
+        combineTo = "AData";
+        break;
+      case 'a':
+        active = true;
+        combineTo = "ACData";
+        break;
+      case 'C':
+        active = true;
+        combineTo = "CData";
+        break;
+      case 'c':
+        active = true;
+        combineTo = "CCData";
+        break;
+      case 'F':
+        active = true;
+        combineTo = "FData";
+        break;
+      case 'f':
+        active = true;
+        combineTo = "FCData";
+        break;
+      case 'G':
+        active = true;
+        combineTo = "GData";
+        break;
+      case 'g':
+        active = true;
+        combineTo = "GCData";
+        break;
+      case 'H':
+        active = true;
+        combineTo = "HData";
+        break;
+      case 'h':
+        active = true;
+        combineTo = "HCData";
+        break;
+      case 'J':
+        active = true;
+        combineTo = "JData";
+        break;
+      case 'j':
+        active = true;
+        combineTo = "JCData";
+        break;
+      case 'K':
+        active = true;
+        combineTo = "KData";
+        break;
+      case 'k':
+        active = true;
+        combineTo = "KCData";
+        break;
       default:
         if (active && isDigit(rx))
         {
@@ -190,6 +278,7 @@ void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
     }
   }
 
+  //  }
 }
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {

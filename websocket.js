@@ -2,8 +2,9 @@ var express = require('express');
 var app = require('express')();
 var path = require('path');
 var http = require('http').Server(app);
+const queue = require('async/queue');
+const mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 var cors = require('cors');
 
 var times = {};
@@ -32,20 +33,14 @@ let collectionName = 'default';
 socket.on('connection', (client) => {
   let changeStream;
   client.on('event', (msg) => {
-    //console.log(msg);
     saveEvent(msg);
   });
   client.on('db', (msg) => {
-    //console.log(msg);
-    // msg = 'DinithiHemakumara';
     socket.emit(collectionName, 'connected to DB');
     createDocsIfNotExists(msg, prefixes1);
-    // createDocsIfNotExists(msg, prefixes2);
     collectionName = msg;
     changeStream = openChangeStream(msg);
     changeStream.on('change', (change) => {
-      //console.log(change.updateDescription.updatedFields);
-      // {type:change.documentKey._id, data:change.updateDescription.updatedValues}
       if (change.operationType === 'update') {
         socket.emit(collectionName, { type: change.documentKey._id, data: change.updateDescription.updatedFields });
       }
@@ -79,77 +74,69 @@ const wss2 = new WebSocket.Server({ port: 8012 });
 
 wss.on('connection', function connection(ws, req) {
   const ip = req.socket.remoteAddress;
-  console.log('Expremental', ip);
-  lastTime = 0;
+  console.log('Experimental', ip);
+  lastRecordedTime = 0;
   ws.on('message', function incoming(message) {
     let msg;
     try {
       msg = JSON.parse(message);
       processTransmission(msg, q, prefixes1);
-    } catch {
+    } catch (err) {
       msg = message;
-      console.log(msg);
+      console.log(err.message, msg);
     }
   });
 
   ws.send('acknowledge connection');
 });
 
-wss2.on('connection', function connection(ws, req) {
-  const ip = req.socket.remoteAddress;
-  // console.log('Control',ip);
-  // lastTime2 = 0;
-  ws.on('message', function incoming(message) {
-    let msg;
-    //console.log(message);
-    try {
-      msg = JSON.parse(message);
-      processTransmission(msg, q2, prefixes2);
-    } catch {
-      msg = message;
-      console.log(msg);
-    }
-  });
+// //npm install async
 
-  ws.send('acknowledge connection');
-});
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-//npm install async
-const queue = require('async/queue');
-// var dbObject;
-// if (collectionName) {
-//     dbObject = db.collection(collectionName); // find by uid
-// }
 const q = queue(function (task, cb) {
-  // console.log(task);
+  console.log(task);
   db.collection(collectionName).updateOne(
     { _id: task.docname },
     { $push: { [task.field]: { $each: task.processed_data }, ['timeStamps']: { $each: task.time } } },
     // { upsert: true },
     (err) => {
       if (err) console.log('DB error:', err);
+      else console.log('succesFul');
       cb();
     }
   );
-}, 1);
-const q2 = queue(function (task, cb) {
-  // console.log(task);
-  db.collection(collectionName).updateOne(
-    { _id: task.docname },
-    { $push: { [task.field]: { $each: task.processed_data }, ['timeStamps']: { $each: task.time } } },
-    // { upsert: true },
-    (err) => {
-      if (err) console.log('DB error:', err);
-      cb();
-    }
-  );
-  // console.log('done');
 }, 1);
 
-var prefixes1 = ['PData', 'SData', 'TData', 'BData', 'EData','PCData', 'SCData', 'TCData', 'BCData' ]; // PAT,ECG,Temp,SpO2,BioZ
-var prefixes2 = ['PressureC', 'SPO2C', 'TemperatureC', 'BioimpedanceC', 'EnvironmentC'];
+var prefixes1 = [
+  'PData',
+  'SData',
+  'TData',
+  'BData',
+  'EData',
+  'PCData',
+  'SCData',
+  'TCData',
+  'BCData',
+  'WData',
+  'WCData',
+  'YData',
+  'YCData',
+  'ZData',
+  'ZCData',
+  'AData',
+  'ACData',
+  'CData',
+  'CCData',
+  'FData',
+  'FCData',
+  'GData',
+  'GCData',
+  'HData',
+  'HCData',
+  'JData',
+  'JCData',
+  'KData',
+  'KCData',
+]; // PAT,ECG,Temp,SpO2,BioZ
 function openChangeStream(collection) {
   const taskCollection = db.collection(collection);
   const changeStream = taskCollection.watch();
@@ -157,31 +144,33 @@ function openChangeStream(collection) {
 }
 
 function processTransmission(req, que) {
-  //console.log('Process Transmission', req);
-  //////////////Sending Data\\\\\\\\\\\\\\\\
+  // console.log('Process Transmission', req);
+  const d = new Date();
+  let timeInt = d.getTime();
   Object.keys(req).forEach((key) => {
     docname = collectionName + key.toString();
     if (req[key].length != 0) {
       const processed_data = req[key];
-      const d = new Date().getTime();
-      var i;
-      var time = [];
-      for (i = 0; i < req[key].length; i++) {
-        time.push(d.toString + (i/10000).toString);
+
+      let time = [];
+      for (let i = 0; i < processed_data.length; i++) {
+        time.push(timeInt + i / 1000);
+        lastRecordedTime = timeInt + i / 1000;
       }
       //pusing to database one by one
       que.push({ processed_data: processed_data, docname: key.toString(), field: 'values', time: time });
     }
   });
 }
-var lastTime = 0;
-// var lastTime2 = 0;
+
+var lastRecordedTime = 0;
 async function saveEvent(name) {
-  db.collection(collectionName).updateOne({ _id: 'events' }, { $push: { [name]: lastTime } }, { upsert: true }, (err) => {
+  db.collection(collectionName).updateOne({ _id: 'events' }, { $push: { [name]: lastRecordedTime } }, { upsert: true }, (err) => {
     if (err) console.log('DB error:', err);
   });
   console.log('Saved');
 }
+
 async function createDocsIfNotExists(collectionName, prefixes) {
   delete mongoose.connection.models['Recording'];
   const recordingSchema = new mongoose.Schema(
@@ -201,8 +190,7 @@ async function createDocsIfNotExists(collectionName, prefixes) {
     promises.push(
       Recording.findOneAndUpdate({ _id: el, name: el }, update, options, function (error, result) {
         if (error) return;
-        console.log(result);
-        // do something with the document
+        console.log('Patient Document :', result);
       })
     );
   });
