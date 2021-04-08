@@ -241,9 +241,14 @@
 	<script>
 		//defining variables
 		var socket = io('http://localhost:90');//socket connection
-		var dps1 = [], dps2 = [], dps3 = [], dps4 = [];
-		var dps1_c = [], dps2_c = [], dps3_c = [], dps4_c = [], dps4_c5 = [];
-		var dps_e;
+		var dps1 = [], dps2 = [], dps3 = [],dps3_ir=[];//experimental arm datapoints
+		//bioimpedance experimental arm datapoints
+		var dps4_1 = [];dps4_2 = [];dps4_3 = [];dps4_4 = [];dps4_5 = [];dps4_6 = [];dps4_7 = [];dps4_8 = [];dps4_9 = [];dps4_10 = [];
+		//control arm data points
+		var dps1_c = [], dps2_c = [], dps3_c = [],dps3_ir_c=[];
+		//bioimpedance control arm datapoints
+		var dps4_1_c = [];dps4_2_c = [];dps4_3_c = [];dps4_4_c = [];dps4_5_c = [];dps4_6_c = [];dps4_7_c = [];dps4_8_c = [];dps4_9_c = [];dps4_10_c = [];
+		var dps_e=[];//environmental temp
 		var charts = [chart1, chart2, chart3, chart4];
 		//var dps=[dps1,dps2,dps3,dps4];
 		var updateInterval = 500;//speed of update half a second
@@ -533,6 +538,14 @@
 					type: "line",
 					dataPoints: dps3_c,
 				},
+				{
+					type: "line",
+					dataPoints: dps3_ir,
+				},
+				{
+					type: "line",
+					dataPoints: dps3_ir_c,
+				},
 			],
 		};
 		//create chart
@@ -642,15 +655,84 @@
 			data: [
 				{
 					type: "line",
-					dataPoints: dps4,
+					dataPoints: dps4_1,
 				},
 				{
 					type: "line",
-					dataPoints: dps4_c,
-				}, {
+					dataPoints: dps4_2,
+				},
+				{
 					type: "line",
-					dataPoints: dps4_c5,
-				}
+					dataPoints: dps4_3,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_4,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_5,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_6,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_7,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_8,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_9,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_10,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_1_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_2_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_3_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_4_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_5_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_6_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_7_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_8_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_9_c,
+				},
+				{
+					type: "line",
+					dataPoints: dps4_10_c,
+				},
 			],
 		};
 		//create chart
@@ -735,17 +817,40 @@
 				})
 				//console.log(time)
 				switch (message.type) {
-					case "PData": updateChart1({ time: time, data: data }, dps1); break;
-					case "TData": updateChart2({ time: time, data: data }, dps2); break;
-					case "SData": updateChart3({ time: time, data: data }, dps3); break;
-					case "WData": updateChart4({ time: time, data: data }, dps4); break;
+					//plots for the experimental arm
+					case "PData": updateChart1({ time: time, data: data }, dps1); break;//pressure
+					case "TData": updateChart2({ time: time, data: data }, dps2); break;//body temperature
+					case "SData": updateChart3({ time: time, data: data }, dps3); break;//SPO2
+					case "BData": updateChart3({ time: time, data: data }, dps3_ir); break; //SPO2 IR
+					//Bioimpedance plots for the experimental arm
+					case "WData": updateChart4({ time: time, data: data }, dps4_1); break;
+					case "YData": updateChart4({ time: time, data: data }, dps4_2); break;
+					case "ZData": updateChart4({ time: time, data: data }, dps4_3); break;
+					case "AData": updateChart4({ time: time, data: data }, dps4_4); break;
+					case "CData": updateChart4({ time: time, data: data }, dps4_5); break;
+					case "FData": updateChart4({ time: time, data: data }, dps4_6); break;
+					case "GData": updateChart4({ time: time, data: data }, dps4_7); break;
+					case "HData": updateChart4({ time: time, data: data }, dps4_8); break;
+					case "JData": updateChart4({ time: time, data: data }, dps4_9); break;
+					case "KData": updateChart4({ time: time, data: data }, dps4_10); break;
 					//case "IData": updateChart5({ time: time, data: data }); break;
-					case "EData": updateChart2({ time: time, data: data }, dps_e); break;
-					case "PCData": updateChart1({ time: time, data: data }, dps1_c); break;
-					case "TCData": updateChart2({ time: time, data: data }, dps2_c); break;
-					case "SCData": updateChart3({ time: time, data: data }, dps3_c); break;
-					case "ACData": updateChart4({ time: time, data: data }, dps4_c); break;
-					case "JCData": updateChart4({ time: time, data: data }, dps4_c5); break;
+					//plots for the control arm
+					case "PCData": updateChart1({ time: time, data: data }, dps1_c); break;//pressure
+					case "EData": updateChart2({ time: time, data: data }, dps_e); break;//environmental temp
+					case "TCData": updateChart2({ time: time, data: data }, dps2_c); break;//body temp
+					case "SCData": updateChart3({ time: time, data: data }, dps3_c); break;//SPO2
+					case "BCData": updateChart3({ time: time, data: data }, dps3_ir_c); break;//SPO2 IR
+					//Bioimpedance plots for the control arm
+					case "WCData": updateChart4({ time: time, data: data }, dps4_1_c); break;
+					case "YCData": updateChart4({ time: time, data: data }, dps4_2_c); break;
+					case "ZCData": updateChart4({ time: time, data: data }, dps4_3_c); break;
+					case "ACData": updateChart4({ time: time, data: data }, dps4_4_c); break;
+					case "CCData": updateChart4({ time: time, data: data }, dps4_5_c); break;
+					case "FCData": updateChart4({ time: time, data: data }, dps4_6_c); break;
+					case "GCData": updateChart4({ time: time, data: data }, dps4_7_c); break;
+					case "HCData": updateChart4({ time: time, data: data }, dps4_8_c); break;
+					case "JCData": updateChart4({ time: time, data: data }, dps4_9_c); break;
+					case "KCData": updateChart4({ time: time, data: data }, dps4_10_c); break;
 				}
 			}
 		});
