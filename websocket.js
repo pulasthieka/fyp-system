@@ -6,7 +6,8 @@ const queue = require('async/queue');
 const mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 var times = {};
 //mongoose.connect('mongodb://localhost/testdb');
 config = {
@@ -61,12 +62,52 @@ db.once('open', () => {
   });
 });
 app.use(express.static(path.join(__dirname, 'public')));
+//adding the form page to collect patient data
 app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/form.html');
+});
+app.get('/plots', function (req, res) {
   res.sendFile(__dirname + '/plots_page.html');
 });
 app.post('/save', function (req, res) {
   console.log(req.body);
 });
+//to save patient data entered in the form to mongodb
+app.post('/patient-data', function (req, res) {
+  //console.log('req', req.body);
+  var myData = createNewUser(req.body);
+  console.log('mydata', myData);
+  myData.save(function (err, results) {
+    console.log(err);
+    let uid = results._id;
+    //console.log(results);
+    res.redirect('/plots?id=' + results.fname + results.lname);
+  });
+});
+//setting collectionName to patient name
+function createNewUser(data) {
+  const nameSchema = new mongoose.Schema(
+    {
+      fname: String,
+      lname: String,
+      age: Number,
+      height: Number,
+      weight: Number,
+      gender: String,
+      phone: Number,
+      condition: String,
+      comment: String,
+    },
+    { collectionName: data.fname + data.lname }
+  );
+  const User = mongoose.model('User', nameSchema);
+  return new User(data);
+}
+async function getName(uid) {
+  let document = await User.findById(uid);
+  console.log(document);
+  return document.fname + ' ' + document.lname;
+}
 
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8011 });
