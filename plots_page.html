@@ -82,7 +82,7 @@
 		margin-bottom: 50px !important;
 	}
 
-	#stop {
+	#release {
 		height: 25px;
 		width: 115px;
 		background-color: blueviolet;
@@ -93,7 +93,17 @@
 		color: white;
 		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	}
-
+	#baseline,#occlusion {
+		height: 25px;
+		width: 115px;
+		background-color: blueviolet;
+		text-align: center;
+		margin-right: 5px;
+		float: right;
+		font-size: 13px;
+		color: white;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	}
 	.switch {
 		position: relative;
 		display: inline-block;
@@ -172,9 +182,10 @@
 	<div>
 		<div class="vl"></div>
 		<div>
-			<p><span id="name"></span> <span id="ct"></span><button id="stop" onclick="redirect();">Stop
-					Occlusion</button></p>
-
+			<p><span id="name"></span> <span id="ct"></span>
+				<button id='release' value="release" class="btn-link">Cuff Release</button>
+				<button id='occlusion' value="occlusion" class="btn-link">Occlusion</button>
+				<button id='baseline' value="baseline" class="btn-link">Baseline</button></p>
 		</div>
 
 		<div class="chartBlock">
@@ -738,7 +749,19 @@
 				}
 			}
 		});
-
+		// var button = document.getElementById('event')
+		document.getElementById('baseline').addEventListener('click', function (msg) {
+			socket.emit('event', 'baseline')
+			console.log('baseline')
+		});
+		document.getElementById('occlusion').addEventListener('click', function (msg) {
+			socket.emit('event', 'occlusion')
+			console.log('occlusion')
+		});
+		document.getElementById('release').addEventListener('click', function (msg) {
+			socket.emit('event', 'release')
+			console.log('release')
+		});
 	</script>
 </body>
 
