@@ -1,0 +1,159 @@
+body {
+  background-color: white;
+}
+
+h6 {
+  font-size: 24px;
+  font-family: 'Segoe UI';
+  font-style: normal;
+  font-weight: lighter;
+  color: blueviolet;
+  margin-bottom: 0px;
+  margin-top: 5px;
+}
+
+p {
+  font-size: small;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-left: 75px;
+}
+
+.chartBlock {
+  width: 40%;
+  height: 400px;
+  float: left;
+  margin-left: 75px;
+}
+.chartArea {
+  width: 89%;
+  height: 50%;
+  display: inline-block;
+  margin-top: 0px;
+}
+.checkBox {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: smaller;
+}
+
+#zi1,
+#zo1,
+#zi2,
+#zo2,
+#zi3,
+#zo3,
+#zi4,
+#zo4 {
+  height: 25px;
+  width: 25px;
+  background-color: blue;
+  /* Green */
+  border: blue;
+  color: white;
+  text-align: center;
+  text-decoration: solid;
+  font-size: 20px;
+  padding: 2.5px 2.5px;
+  float: right;
+  margin-right: 3px;
+}
+
+.vl {
+  border-left: 2px solid gray;
+  height: 85%;
+  position: absolute;
+  left: 48%;
+  margin-top: 55px;
+  top: 0;
+}
+
+.canvasjs-chart-toolbar {
+  left: 0 !important;
+  right: auto !important;
+  margin-top: 5px !important;
+  margin-bottom: 50px !important;
+}
+
+#stop,
+#release {
+  height: 25px;
+  width: 115px;
+  background-color: blueviolet;
+  text-align: center;
+  margin-right: 115px;
+  float: right;
+  font-size: 13px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#baseline,
+#occlusion {
+  height: 25px;
+  width: 115px;
+  background-color: blueviolet;
+  text-align: center;
+  margin-right: 5px;
+  float: right;
+  font-size: 13px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
