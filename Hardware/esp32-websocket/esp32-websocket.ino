@@ -34,9 +34,9 @@ DynamicJsonDocument root(capacity);
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char* ssid = "MiA2";
-const char* password = "12345678";
-const char* ip = "192.168.43.238";
+const char* ssid = "SSID";
+const char* password = "password";
+const char* ip = "192.168.8.137";
 const int port = 8011;
 bool wsconnected = false;
 
@@ -51,8 +51,8 @@ void setup()
   displayWelcomeMessage();
 
   Serial.begin(115200);
-  MySerial1.begin(2000000, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
-  Serial2.begin(2000000);
+  MySerial1.begin(115200, SERIAL_8N1, 2, 4); //https://quadmeup.com/arduino-esp32-and-3-hardware-serial-ports/
+  Serial2.begin(115200);
 
   MySerial1.setRxBufferSize(1024); //Setting Serial Buffer size for 1
   Serial2.setRxBufferSize(1024); //Setting Serial Buffer size for 2
