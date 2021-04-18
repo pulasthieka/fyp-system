@@ -5,11 +5,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Plots</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
 	<link rel="stylesheet" type="text/css" href="plot-style.css">
-	<!--<script src="http://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>-->
 	<!-- <script type="text/javascript" language="javascript"></script> -->
 	<script src="socket.io.js"></script>
 	<script src="jquery-3.5.1.js"></script>
@@ -132,7 +129,7 @@
 							this.resetFlag = false;
 							if (this.updateRange > 0) clearInterval(this.updateRange);
 							this.updateRange = setInterval(function () {
-								this.updateAxisRange1(); //defined below
+								this.updateAxisRange(); //defined below
 							}, this.updateInterval);
 						} else if (e1.trigger == 'reset') {
 							this.resetFlag = true;
@@ -157,7 +154,6 @@
 			}
 
 			updateChart(upd, dps) {
-				console.log(upd)
 				let count = upd.time.length;
 				for (var j = 0; j < count; j++) {
 					this.dataPoints[dps].dataPoints.push({
@@ -212,7 +208,7 @@
 		}
 
 		let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
-		let chart2 = new DataChart("chartContainer2", 2, "zi2", "zo2")
+		let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
 		let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
 		let chart4 = new DataChart("chartContainer4", 3, "zi4", "zo4")
 
@@ -225,18 +221,18 @@
 		// obtaining data from socket io to plot the data
 		socket.on(uid, (message) => {
 			// console.log(message);
-			let time = [0, 1, 2, 3, 4, 5, 6, 7];
-			let data = [0, 10, 0, 0, 0, 0, 0, 0];
+			let time = [];
+			let data = [];
 			if (message.data) {
 				Object.keys(message.data).forEach(el => {
 					if (el[0] == 't') {
-						time.push(Number(el.substr(11)))
+						// time.push(Number(el.substr(11)))
+						time.push(message.data[el]) //convert this to actual date time
 					}
 					else {
 						data.push(message.data[el])
 					}
 				})
-				//console.log(time)
 				switch (message.type) {
 					case "PData": chart1.updateChart({ time: time, data: data }, 0); break;
 					case "TData": chart2.updateChart({ time: time, data: data }, 0); break;
