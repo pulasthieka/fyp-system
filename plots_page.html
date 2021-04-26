@@ -159,6 +159,7 @@
 				let count = upd.time.length;
 				for (var j = 0; j < count; j++) {
 					this.dataPoints[dps].dataPoints.push({
+						// x: upd.time[j],
 						x: upd.time[j],
 						y: upd.data[j],
 					});
@@ -215,7 +216,7 @@
 		let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
 		let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
 		let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
-		let chart4 = new DataChart("chartContainer4", 3, "zi4", "zo4")
+		let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
 
 
 		const queryString = window.location.search;
@@ -231,8 +232,9 @@
 			if (message.data) {
 				Object.keys(message.data).forEach(el => {
 					if (el[0] == 't') {
-						// time.push(Number(el.substr(11)))
-						time.push(message.data[el]) //convert this to actual date time
+						time.push(Number(el.substr(11)))	
+						// time.push(Number(el.slice(4)))
+						// time.push(message.data[el]) //convert this to actual date time
 					}
 					else {
 						data.push(message.data[el])
@@ -248,8 +250,9 @@
 					case "PCData": chart1.updateChart({ time: time, data: data }, 1); break;
 					case "TCData": chart2.updateChart({ time: time, data: data }, 1); break;
 					case "SCData": chart3.updateChart({ time: time, data: data }, 1); break;
-					case "ACData": chart4.updateChart({ time: time, data: data }, 1); break;
-					case "JCData": chart4.updateChart({ time: time, data: data }, 2); break;
+					case "WCData": chart4.updateChart({ time: time, data: data }, 1); break;
+					case "YCData": chart4.updateChart({ time: time, data: data }, 2); break;
+					case "YData": chart4.updateChart({ time: time, data: data }, 3); break;
 				}
 			}
 		});
