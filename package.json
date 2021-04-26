@@ -21,12 +21,15 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.9.11",
-    "socket.io": "^2.3.0",
+    "mongoose": "^5.12.3",
+    "socket.io": "^2.4.1",
     "ws": "^7.4.3"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.3",
     "utf-8-validate": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.37"
   }
 }
