@@ -26,7 +26,8 @@ WebSocketsClient webSocket;
 
 unsigned long currentMillis;
 unsigned long previousMillis = 0;
-const long interval = 100;
+const long interval = 200;
+// int length_of_payload = 0;
 
 //int capacity = 1024;
 //const char json[] = "{\"PData\":[],\"SData\":[],\"BData\":[],\"TData\":[],\"EData\":[],\"PCData\":[],\"SCData\":[],\"BCData\":[],\"TCData\":[],\"ECData\":[],\"WData\":[],\"WCData\":[],\"CData\":[],\"CCData\":[],\"YData\":[],\"YCData\":[],\"ZData\":[],\"ZCData\":[],\"AData\":[],\"ACData\":[],\"FData\":[],\"FCData\":[],\"GData\":[],\"GCData\":[],\"HData\":[],\"HCData\":[],\"JData\":[],\"JCData\":[],\"KData\":[],\"KCData\":[]}";
@@ -34,9 +35,9 @@ const long interval = 100;
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char* ssid = "timmy";
-const char* password = "CPNbims98";
-const char* ip = "192.168.1.9";
+const char* ssid = "wifi";
+const char* password = "pSW";
+const char* ip = "192.168.1.12";
 const int port = 8011;
 bool wsconnected = false;
 
@@ -46,7 +47,7 @@ String SData = "[";
 String BData = "[";
 String PData = "[";
 String TCData = "[";
-String ECData = "[";
+//String ECData = "[";
 String SCData = "[";
 String BCData = "[";
 String PCData = "[";
@@ -54,22 +55,22 @@ String WData = "[";
 String WCData = "[";
 String YData = "[";
 String YCData = "[";
-String ZData = "[";
-String ZCData = "[";
-String AData = "[";
-String ACData = "[";
-String CData = "[";
-String CCData = "[";
-String FData = "[";
-String FCData = "[";
-String GData = "[";
-String GCData = "[";
-String HData = "[";
-String HCData = "[";
-String JData = "[";
-String JCData = "[";
-String KData = "[";
-String KCData = "[";
+//String ZData = "[";
+//String ZCData = "[";
+//String AData = "[";
+//String ACData = "[";
+//String CData = "[";
+//String CCData = "[";
+//String FData = "[";
+//String FCData = "[";
+//String GData = "[";
+//String GCData = "[";
+//String HData = "[";
+//String HCData = "[";
+//String JData = "[";
+//String JCData = "[";
+//String KData = "[";
+//String KCData = "[";
 
 
 void setup()
@@ -126,12 +127,15 @@ void Send_data()
     while (wsconnected)
     {
       currentMillis = millis();
+      // length_of_payload = TData.length() + EData.length() + SData.length() + BData.length() + PData.length() + TCData.length() + SCData.length() + BCData.length() + PCData.length() + WData.length() + WCData.length() + YData.length() + YCData.length()  ;
       while (currentMillis - previousMillis < interval)
+        //      while (length_of_payload < 1600)
       {
         currentMillis = millis();
         delayMicroseconds(5);
         readBuffer(MySerial1);
         readBuffer(Serial2);
+        // length_of_payload = TData.length() + EData.length() + SData.length() + BData.length() + PData.length() + TCData.length() + SCData.length() + BCData.length() + PCData.length() + WData.length() + WCData.length() + YData.length() + YCData.length()  ;
       }
       previousMillis = currentMillis;
       //      while (currentMillis - previousMillis < 2*interval)
@@ -143,9 +147,11 @@ void Send_data()
       //      previousMillis = currentMillis;
       removeCommas();
       payload = "";
-      payload = "{\"TData\":" + TData + "],\"EData\":" + EData + "],\"SData\":" + SData + "],\"BData\":" + BData + "],\"PData\":" + PData + "],\"TCData\":" + TCData + "],\"ECData\":" + ECData + "],\"SCData\":" + SCData + "],\"BCData\":" + BCData + "],\"PCData\":" + PCData + "],\"WData\":" + WData + "],\"WCData\":" + WCData + "],\"YData\":" + YData + "],\"YCData\":" + YCData + "],\"ZData\":" + ZData + "],\"ZCData\":" + ZCData + "],\"AData\":" + AData + "],\"ACData\":" + ACData + "],\"CData\":" + CData + "],\"CCData\":" + CCData + "],\"FData\":" + FData + "],\"FCData\":" + FCData + "],\"GData\":" + GData + "],\"GCData\":" + GCData + "],\"HData\":" + HData + "],\"HCData\":" + HCData + "],\"JData\":" + JData + "],\"JCData\":" + JCData + "],\"KData\":" + KData + "],\"KCData\":" + KCData + "] }" ;
+      //      payload = "{\"TData\":" + TData + "],\"EData\":" + EData + "],\"SData\":" + SData + "],\"BData\":" + BData + "],\"PData\":" + PData + "],\"TCData\":" + TCData + "],\"ECData\":" + ECData + "],\"SCData\":" + SCData + "],\"BCData\":" + BCData + "],\"PCData\":" + PCData + "],\"WData\":" + WData + "],\"WCData\":" + WCData + "],\"YData\":" + YData + "],\"YCData\":" + YCData + "],\"ZData\":" + ZData + "],\"ZCData\":" + ZCData + "],\"AData\":" + AData + "],\"ACData\":" + ACData + "],\"CData\":" + CData + "],\"CCData\":" + CCData + "],\"FData\":" + FData + "],\"FCData\":" + FCData + "],\"GData\":" + GData + "],\"GCData\":" + GCData + "],\"HData\":" + HData + "],\"HCData\":" + HCData + "],\"JData\":" + JData + "],\"JCData\":" + JCData + "],\"KData\":" + KData + "],\"KCData\":" + KCData + "] }" ;
+      //        payload = "{\"TData\":" + TData + "],\"EData\":" + EData + "],\"SData\":" + SData + "],\"BData\":" + BData + "],\"PData\":" + PData + "],\"WData\":" + WData + "],\"WCData\":" + WCData + "] }" ;
+      payload = "{\"TData\":" + TData + "],\"EData\":" + EData + "],\"SData\":" + SData + "],\"BData\":" + BData + "],\"PData\":" + PData + "],\"TCData\":" + TCData + "],\"SCData\":" + SCData + "],\"BCData\":" + BCData + "],\"PCData\":" + PCData + "],\"WData\":" + WData + "],\"WCData\":" + WCData + "],\"YData\":" + YData + "],\"YCData\":" + YCData + "]}" ;
       // serializeJson(root, Serial);//print to serial port
-      Serial.println(payload);
+      Serial.println(payload.length());
       resetData();
       //      serializeJson(root, payload);
       webSocket.sendTXT(payload);
@@ -168,143 +174,154 @@ void readBuffer(HardwareSerial buffReader)
 {
   //  while (!active) {
   //Serial.print(".2!");
-
-  while (buffReader.available())
+  active = false; //starting with a number
+  while (buffReader.available() || active)
   { //Reading buffer
-    rx = buffReader.read();
-    //    Serial.print(rx);
+//    while (!buffReader.available()){delayMicroseconds(1);} 
+    rx = char(buffReader.read());
     switch (rx)
     {
       case 'X':
         if (active)
         {
-          active = false;
-          // JsonArray current = doc[combineTo];
           *combineTo = *combineTo + value + ",";
           value = "";
           return;
         }
+        active = false;
         break;
       case 'T':
         active = true;
         combineTo = &TData;
+        value = "";
         break;
       case 'E':
         active = true;
         combineTo = &EData;
+        value = "";
         break;
       case 'I':
         active = true;
         combineTo = &SData;
+        value = "";
         break;
-      case 'B':
+      case 'R':
         active = true;
         combineTo = &BData;
+        value = "";
         break;
       case 'P':
         active = true;
         combineTo = &PData;
+        value = "";
         break;
       case 't':
         active = true;
         combineTo = &TCData;
+        value = "";
         break;
-      case 'e':
-        active = true;
-        combineTo = &ECData;
-        break;
+      //      case 'e':
+      //        active = true;
+      //        combineTo = &ECData;
+      //        break;
       case 'i':
         active = true;
         combineTo = &SCData;
+        value = "";
         break;
       case 'r':
         active = true;
         combineTo = &BCData;
+        value = "";
         break;
       case 'p':
         active = true;
         combineTo = &PCData;
         break;
-      case 'W':
-        active = true;
-        combineTo = &WData;
-        break;
-      case 'w':
-        active = true;
-        combineTo = &WCData;
-        break;
-      case 'Y':
-        active = true;
-        combineTo = &YData;
-        break;
-      case 'y':
-        active = true;
-        combineTo = &YCData;
-        break;
-      case 'Z':
-        active = true;
-        combineTo = &ZData;
-        break;
-      case 'z':
-        active = true;
-        combineTo = &ZCData;
-        break;
       case 'A':
         active = true;
-        combineTo = &AData;
+        combineTo = &WData;
+        value = "";
         break;
       case 'a':
         active = true;
-        combineTo = &ACData;
+        combineTo = &WCData;
+        value = "";
         break;
-      case 'C':
+      case 'B':
         active = true;
-        combineTo = &CData;
+        combineTo = &YData;
+        value = "";
         break;
-      case 'c':
+      case 'b':
         active = true;
-        combineTo = &CCData;
+        combineTo = &YCData;
+        value = "";
         break;
-      case 'F':
-        active = true;
-        combineTo = &FData;
-        break;
-      case 'f':
-        active = true;
-        combineTo = &FCData;
-        break;
-      case 'G':
-        active = true;
-        combineTo = &GData;
-        break;
-      case 'g':
-        active = true;
-        combineTo = &GCData;
-        break;
-      case 'H':
-        active = true;
-        combineTo = &HData;
-        break;
-      case 'h':
-        active = true;
-        combineTo = &HCData;
-        break;
-      case 'J':
-        active = true;
-        combineTo = &JData;
-        break;
-      case 'j':
-        active = true;
-        combineTo = &JCData;
-        break;
-      case 'K':
-        active = true;
-        combineTo = &KData;
-        break;
-      case 'k':
-        active = true;
-        combineTo = &KCData;
-        break;
+      //      case 'O':
+      //        active = true;
+      //        combineTo = &ZData;
+      //        break;
+      //      case 'P':
+      //        active = true;
+      //        combineTo = &ZCData;
+      //        break;
+      //      case 'Q':
+      //        active = true;
+      //        combineTo = &AData;
+      //        break;
+      //      case 'R':
+      //        active = true;
+      //        combineTo = &ACData;
+      //        break;
+      //      case 'S':
+      //        active = true;
+      //        combineTo = &CData;
+      //        break;
+      //      case 'T':
+      //        active = true;
+      //        combineTo = &CCData;
+      //        break;
+      //      case 'U':
+      //        active = true;
+      //        combineTo = &FData;
+      //        break;
+      //      case 'V':
+      //        active = true;
+      //        combineTo = &FCData;
+      //        break;
+      //      case 'W':
+      //        active = true;
+      //        combineTo = &GData;
+      //        break;
+      //      case 'Y':
+      //        active = true;
+      //        combineTo = &GCData;
+      //        break;
+      //      case 'Z':
+      //        active = true;
+      //        combineTo = &HData;
+      //        break;
+      //      case '*':
+      //        active = true;
+      //        combineTo = &HCData;
+      //        break;
+      //      case '(':
+      //        active = true;
+      //        combineTo = &JData;
+      //        break;
+      //      case ')':
+      //        active = true;
+      //        combineTo = &JCData;
+      //        break;
+      //      case '+':
+      //        active = true;
+      //        combineTo = &KData;
+      //        break;
+      //      case '-':
+      //        active = true;
+      //        combineTo = &KCData;
+      //        break;
       default:
         if (active && isDigit(rx))
         {
@@ -353,7 +370,7 @@ void removeCommas() {
   removeComma(BData);
   removeComma(PData);
   removeComma(TCData);
-  removeComma(ECData);
+  //  removeComma(ECData);
   removeComma(SCData);
   removeComma(BCData);
   removeComma(PCData);
@@ -361,22 +378,22 @@ void removeCommas() {
   removeComma(WCData);
   removeComma(YData);
   removeComma(YCData);
-  removeComma(ZData);
-  removeComma(ZCData);
-  removeComma(AData);
-  removeComma(ACData);
-  removeComma(CData);
-  removeComma(CCData);
-  removeComma(FData);
-  removeComma(FCData);
-  removeComma(GData);
-  removeComma(GCData);
-  removeComma(HData);
-  removeComma(HCData);
-  removeComma(JData);
-  removeComma(JCData);
-  removeComma(KData);
-  removeComma(KCData);
+  //  removeComma(ZData);
+  //  removeComma(ZCData);
+  //  removeComma(AData);
+  //  removeComma(ACData);
+  //  removeComma(CData);
+  //  removeComma(CCData);
+  //  removeComma(FData);
+  //  removeComma(FCData);
+  //  removeComma(GData);
+  //  removeComma(GCData);
+  //  removeComma(HData);
+  //  removeComma(HCData);
+  //  removeComma(JData);
+  //  removeComma(JCData);
+  //  removeComma(KData);
+  //  removeComma(KCData);
 }
 
 void removeComma(String &memRef)
@@ -396,7 +413,7 @@ void resetData()
   BData = "[";
   PData = "[";
   TCData = "[";
-  ECData = "[";
+  //  ECData = "[";
   SCData = "[";
   BCData = "[";
   PCData = "[";
@@ -404,22 +421,22 @@ void resetData()
   WCData = "[";
   YData = "[";
   YCData = "[";
-  ZData = "[";
-  ZCData = "[";
-  AData = "[";
-  ACData = "[";
-  CData = "[";
-  CCData = "[";
-  FData = "[";
-  FCData = "[";
-  GData = "[";
-  GCData = "[";
-  HData = "[";
-  HCData = "[";
-  JData = "[";
-  JCData = "[";
-  KData = "[";
-  KCData = "[";
+  //  ZData = "[";
+  //  ZCData = "[";
+  //  AData = "[";
+  //  ACData = "[";
+  //  CData = "[";
+  //  CCData = "[";
+  //  FData = "[";
+  //  FCData = "[";
+  //  GData = "[";
+  //  GCData = "[";
+  //  HData = "[";
+  //  HCData = "[";
+  //  JData = "[";
+  //  JCData = "[";
+  //  KData = "[";
+  //  KCData = "[";
 }
 
 //Functions for display

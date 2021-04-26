@@ -76,7 +76,7 @@ void waitTillImpReady(void) {
   }
 }
 
-void printImp(char realChar, char imgChar) {
+void printImp(String realChar, String imgChar) {
   waitTillImpReady(); //Making sure we don't get invalid data
   real = ADread(0x94) << 7; //looks kinda funny but simple way didn't work (at least in my arduino
   real = real << 1 | ADread(0x95);
