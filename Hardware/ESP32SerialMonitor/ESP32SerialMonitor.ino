@@ -16,10 +16,9 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   while (Serial2.available()) {
-    Serial.print(Serial2.read());
+    Serial.print(char(Serial2.read()));
   }
   while (MySerial1.available()) {
-    char rx = MySerial1.read();
-    Serial.print(rx);
+     Serial.print(char(MySerial1.read()));
   }
 }
