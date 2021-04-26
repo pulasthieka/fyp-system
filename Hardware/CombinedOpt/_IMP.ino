@@ -1,8 +1,8 @@
 const int device_address = 0x0D;
-const unsigned int numberOfIncremrnts = 5;
-const unsigned int incrementFrequency = 10000;
-const unsigned int settlingCycles = 200; //Must be less than 512
-const unsigned int startFrequency = 5000;
+const unsigned int numberOfIncremrnts = 2;
+const unsigned int incrementFrequency = 0;
+const unsigned int settlingCycles = 100; //Must be less than 512
+const unsigned int startFrequency = 50000;
 unsigned int currentFrequency; // variable to keep track of current frequency after frequency increment
 long img = 0;
 long real = 0;

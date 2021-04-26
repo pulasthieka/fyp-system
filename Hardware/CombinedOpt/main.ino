@@ -14,7 +14,7 @@ void setup() {
   delay(10); //Max powerup time
   while (!Serial);
   Serial.println("setup complete ATMEGA");
-  checkAD5933();
+//  checkAD5933();
 }
 
 void loop() {
@@ -113,89 +113,89 @@ void loop() {
     timeThis("4:idle imp 1:");
     printImp('F', 'f'); //Getting the sample from AD5933 and serial printing
     timeThis("5:reading imp 1:");
-
-       isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
-    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    if ( isBodyTempAvailable) {
-      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
-      SerialPlot("T", 100 * temperatureC);
-    }
-    timeThis("16:communicate body temp:");
-
-    if ( isEnvTempAvailable) {
-      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
-      SerialPlot("E", 100 * temperatureC);
-    }
-    timeThis("19:communicate env temp:");
-     
-    waitTillImpReady(); timeThis("6:idle imp 2:");
-    printImp('G', 'g'); timeThis("7:reading imp 2:");
-
-        isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
-    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-
-    waitTillImpReady(); timeThis("8:idle imp 3:");
-    printImp('H', 'h'); timeThis("9:reading imp 3:");
-    
-    if ( isBodyTempAvailable) {
-      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
-      SerialPlot("T", 100 * temperatureC);
-    }
-    timeThis("16:communicate body temp:");
-
-    if ( isEnvTempAvailable) {
-      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
-      SerialPlot("E", 100 * temperatureC);
-    }
-    timeThis("19:communicate env temp:");
-
-           isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
-    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-    
-    waitTillImpReady(); timeThis("10:idle imp 4:");
-    printImp('J', 'j'); timeThis("11:reading imp 4:");
-    
-    getPAT();
-    getPPG();
-    getPAT();
-    getPPG();
-
-    if ( isBodyTempAvailable) {
-      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
-      SerialPlot("T", 100 * temperatureC);
-    }
-    timeThis("16:communicate body temp:");
-
-    if ( isEnvTempAvailable) {
-      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
-      SerialPlot("E", 100 * temperatureC);
-    }
-    timeThis("19:communicate env temp:");
-
-    waitTillImpReady(); timeThis("12:idle imp 5:");
-    printImp('K', 'k'); timeThis("13:reading imp 5:");
+//
+//       isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
+//    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    if ( isBodyTempAvailable) {
+//      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
+//      SerialPlot("T", 100 * temperatureC);
+//    }
+//    timeThis("16:communicate body temp:");
+//
+//    if ( isEnvTempAvailable) {
+//      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
+//      SerialPlot("E", 100 * temperatureC);
+//    }
+//    timeThis("19:communicate env temp:");
+//     
+//    waitTillImpReady(); timeThis("6:idle imp 2:");
+//    printImp('G', 'g'); timeThis("7:reading imp 2:");
+//
+//        isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
+//    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//
+//    waitTillImpReady(); timeThis("8:idle imp 3:");
+//    printImp('H', 'h'); timeThis("9:reading imp 3:");
+//    
+//    if ( isBodyTempAvailable) {
+//      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
+//      SerialPlot("T", 100 * temperatureC);
+//    }
+//    timeThis("16:communicate body temp:");
+//
+//    if ( isEnvTempAvailable) {
+//      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
+//      SerialPlot("E", 100 * temperatureC);
+//    }
+//    timeThis("19:communicate env temp:");
+//
+//           isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis("14:request body temp:");
+//    isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis("17:request env temp:");
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//    
+//    waitTillImpReady(); timeThis("10:idle imp 4:");
+//    printImp('J', 'j'); timeThis("11:reading imp 4:");
+//    
+//    getPAT();
+//    getPPG();
+//    getPAT();
+//    getPPG();
+//
+//    if ( isBodyTempAvailable) {
+//      temperatureC = getTemp(BodyTempAdd); timeThis("15:received body temp:");
+//      SerialPlot("T", 100 * temperatureC);
+//    }
+//    timeThis("16:communicate body temp:");
+//
+//    if ( isEnvTempAvailable) {
+//      temperatureC = getTemp(EnvTempAdd); timeThis("18:received env temp:");
+//      SerialPlot("E", 100 * temperatureC);
+//    }
+//    timeThis("19:communicate env temp:");
+//
+//    waitTillImpReady(); timeThis("12:idle imp 5:");
+//    printImp('K', 'k'); timeThis("13:reading imp 5:");
   }
 
 }

@@ -28,17 +28,48 @@ unsigned long currentMillis;
 unsigned long previousMillis = 0;
 const long interval = 100;
 
-int capacity = 1024;
-const char json[] = "{\"PData\":[],\"SData\":[],\"BData\":[],\"TData\":[],\"EData\":[],\"PCData\":[],\"SCData\":[],\"BCData\":[],\"TCData\":[],\"ECData\":[],\"WData\":[],\"WCData\":[],\"CData\":[],\"CCData\":[],\"YData\":[],\"YCData\":[],\"ZData\":[],\"ZCData\":[],\"AData\":[],\"ACData\":[],\"FData\":[],\"FCData\":[],\"GData\":[],\"GCData\":[],\"HData\":[],\"HCData\":[],\"JData\":[],\"JCData\":[],\"KData\":[],\"KCData\":[]}";
-DynamicJsonDocument root(capacity);
+//int capacity = 1024;
+//const char json[] = "{\"PData\":[],\"SData\":[],\"BData\":[],\"TData\":[],\"EData\":[],\"PCData\":[],\"SCData\":[],\"BCData\":[],\"TCData\":[],\"ECData\":[],\"WData\":[],\"WCData\":[],\"CData\":[],\"CCData\":[],\"YData\":[],\"YCData\":[],\"ZData\":[],\"ZCData\":[],\"AData\":[],\"ACData\":[],\"FData\":[],\"FCData\":[],\"GData\":[],\"GCData\":[],\"HData\":[],\"HCData\":[],\"JData\":[],\"JCData\":[],\"KData\":[],\"KCData\":[]}";
+//DynamicJsonDocument root(capacity);
 String payload;
 char rx = 'X'; //to read first byte from serial buffer
 
-const char* ssid = "SSID";
-const char* password = "password";
-const char* ip = "192.168.8.137";
+const char* ssid = "timmy";
+const char* password = "CPNbims98";
+const char* ip = "192.168.1.9";
 const int port = 8011;
 bool wsconnected = false;
+
+String TData = "[";
+String EData = "[";
+String SData = "[";
+String BData = "[";
+String PData = "[";
+String TCData = "[";
+String ECData = "[";
+String SCData = "[";
+String BCData = "[";
+String PCData = "[";
+String WData = "[";
+String WCData = "[";
+String YData = "[";
+String YCData = "[";
+String ZData = "[";
+String ZCData = "[";
+String AData = "[";
+String ACData = "[";
+String CData = "[";
+String CCData = "[";
+String FData = "[";
+String FCData = "[";
+String GData = "[";
+String GCData = "[";
+String HData = "[";
+String HCData = "[";
+String JData = "[";
+String JCData = "[";
+String KData = "[";
+String KCData = "[";
 
 
 void setup()
@@ -77,7 +108,7 @@ void setup()
   //  webSocket.setAuthorization("user", "Password"); // use HTTP Basic Authorization this is optional remove if not needed
   webSocket.setReconnectInterval(5000); // try ever 5000 again if connection has failed
 
-  deserializeJson(root, json); // configure JSON object
+  //  deserializeJson(root, json); // configure JSON object
 }
 
 void loop()
@@ -99,22 +130,26 @@ void Send_data()
       {
         currentMillis = millis();
         delayMicroseconds(5);
-        readBuffer(MySerial1, root);
-        readBuffer(Serial2, root);
+        readBuffer(MySerial1);
+        readBuffer(Serial2);
       }
       previousMillis = currentMillis;
-//      while (currentMillis - previousMillis < 2*interval)
-//      {
-//        currentMillis = millis();
-//        delayMicroseconds(5);
-//        readBuffer(Serial2, root);
-//      }
-//      previousMillis = currentMillis;
+      //      while (currentMillis - previousMillis < 2*interval)
+      //      {
+      //        currentMillis = millis();
+      //        delayMicroseconds(5);
+      //        readBuffer(Serial2, root);
+      //      }
+      //      previousMillis = currentMillis;
+      removeCommas();
       payload = "";
-      serializeJson(root, Serial);//print to serial port
-      serializeJson(root, payload);
+      payload = "{\"TData\":" + TData + "],\"EData\":" + EData + "],\"SData\":" + SData + "],\"BData\":" + BData + "],\"PData\":" + PData + "],\"TCData\":" + TCData + "],\"ECData\":" + ECData + "],\"SCData\":" + SCData + "],\"BCData\":" + BCData + "],\"PCData\":" + PCData + "],\"WData\":" + WData + "],\"WCData\":" + WCData + "],\"YData\":" + YData + "],\"YCData\":" + YCData + "],\"ZData\":" + ZData + "],\"ZCData\":" + ZCData + "],\"AData\":" + AData + "],\"ACData\":" + ACData + "],\"CData\":" + CData + "],\"CCData\":" + CCData + "],\"FData\":" + FData + "],\"FCData\":" + FCData + "],\"GData\":" + GData + "],\"GCData\":" + GCData + "],\"HData\":" + HData + "],\"HCData\":" + HCData + "],\"JData\":" + JData + "],\"JCData\":" + JCData + "],\"KData\":" + KData + "],\"KCData\":" + KCData + "] }" ;
+      // serializeJson(root, Serial);//print to serial port
+      Serial.println(payload);
+      resetData();
+      //      serializeJson(root, payload);
       webSocket.sendTXT(payload);
-      deserializeJson(root, json);
+      //      deserializeJson(root, json);
       delay(10);
     }
   }
@@ -125,11 +160,11 @@ void Send_data()
 
 // buffer reading function
 boolean active = false;
-char* combineTo;
+String* combineTo;
 String *combineTime;
 String value = "";
 
-void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
+void readBuffer(HardwareSerial buffReader)
 {
   //  while (!active) {
   //Serial.print(".2!");
@@ -137,138 +172,138 @@ void readBuffer(HardwareSerial buffReader, DynamicJsonDocument &doc)
   while (buffReader.available())
   { //Reading buffer
     rx = buffReader.read();
-//    Serial.print(rx);
+    //    Serial.print(rx);
     switch (rx)
     {
       case 'X':
         if (active)
         {
           active = false;
-          JsonArray current = doc[combineTo];
-          current.add(value.toInt());
+          // JsonArray current = doc[combineTo];
+          *combineTo = *combineTo + value + ",";
           value = "";
           return;
         }
         break;
       case 'T':
         active = true;
-        combineTo = "TData";
+        combineTo = &TData;
         break;
       case 'E':
         active = true;
-        combineTo = "EData";
+        combineTo = &EData;
         break;
       case 'I':
         active = true;
-        combineTo = "SData";
+        combineTo = &SData;
         break;
       case 'B':
         active = true;
-        combineTo = "BData";
+        combineTo = &BData;
         break;
       case 'P':
         active = true;
-        combineTo = "PData";
+        combineTo = &PData;
         break;
       case 't':
         active = true;
-        combineTo = "TCData";
+        combineTo = &TCData;
         break;
       case 'e':
         active = true;
-        combineTo = "ECData";
+        combineTo = &ECData;
         break;
       case 'i':
         active = true;
-        combineTo = "SCData";
+        combineTo = &SCData;
         break;
       case 'r':
         active = true;
-        combineTo = "BCData";
+        combineTo = &BCData;
         break;
       case 'p':
         active = true;
-        combineTo = "PCData";
+        combineTo = &PCData;
         break;
       case 'W':
         active = true;
-        combineTo = "WData";
+        combineTo = &WData;
         break;
       case 'w':
         active = true;
-        combineTo = "WCData";
+        combineTo = &WCData;
         break;
       case 'Y':
         active = true;
-        combineTo = "YData";
+        combineTo = &YData;
         break;
       case 'y':
         active = true;
-        combineTo = "YCData";
+        combineTo = &YCData;
         break;
       case 'Z':
         active = true;
-        combineTo = "ZData";
+        combineTo = &ZData;
         break;
       case 'z':
         active = true;
-        combineTo = "ZCData";
+        combineTo = &ZCData;
         break;
       case 'A':
         active = true;
-        combineTo = "AData";
+        combineTo = &AData;
         break;
       case 'a':
         active = true;
-        combineTo = "ACData";
+        combineTo = &ACData;
         break;
       case 'C':
         active = true;
-        combineTo = "CData";
+        combineTo = &CData;
         break;
       case 'c':
         active = true;
-        combineTo = "CCData";
+        combineTo = &CCData;
         break;
       case 'F':
         active = true;
-        combineTo = "FData";
+        combineTo = &FData;
         break;
       case 'f':
         active = true;
-        combineTo = "FCData";
+        combineTo = &FCData;
         break;
       case 'G':
         active = true;
-        combineTo = "GData";
+        combineTo = &GData;
         break;
       case 'g':
         active = true;
-        combineTo = "GCData";
+        combineTo = &GCData;
         break;
       case 'H':
         active = true;
-        combineTo = "HData";
+        combineTo = &HData;
         break;
       case 'h':
         active = true;
-        combineTo = "HCData";
+        combineTo = &HCData;
         break;
       case 'J':
         active = true;
-        combineTo = "JData";
+        combineTo = &JData;
         break;
       case 'j':
         active = true;
-        combineTo = "JCData";
+        combineTo = &JCData;
         break;
       case 'K':
         active = true;
-        combineTo = "KData";
+        combineTo = &KData;
         break;
       case 'k':
         active = true;
-        combineTo = "KCData";
+        combineTo = &KCData;
         break;
       default:
         if (active && isDigit(rx))
@@ -311,7 +346,81 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
   }
 
 }
+void removeCommas() {
+  removeComma(TData);
+  removeComma(EData);
+  removeComma(SData);
+  removeComma(BData);
+  removeComma(PData);
+  removeComma(TCData);
+  removeComma(ECData);
+  removeComma(SCData);
+  removeComma(BCData);
+  removeComma(PCData);
+  removeComma(WData);
+  removeComma(WCData);
+  removeComma(YData);
+  removeComma(YCData);
+  removeComma(ZData);
+  removeComma(ZCData);
+  removeComma(AData);
+  removeComma(ACData);
+  removeComma(CData);
+  removeComma(CCData);
+  removeComma(FData);
+  removeComma(FCData);
+  removeComma(GData);
+  removeComma(GCData);
+  removeComma(HData);
+  removeComma(HCData);
+  removeComma(JData);
+  removeComma(JCData);
+  removeComma(KData);
+  removeComma(KCData);
+}
 
+void removeComma(String &memRef)
+{
+  if (memRef[memRef.length() - 1] == ',')
+  {
+    memRef.remove(memRef.length() - 1); //removing ending coma
+  }
+}
+void resetData()
+{
+  //    Serial.println("Resetting");
+
+  TData = "[";
+  EData = "[";
+  SData = "[";
+  BData = "[";
+  PData = "[";
+  TCData = "[";
+  ECData = "[";
+  SCData = "[";
+  BCData = "[";
+  PCData = "[";
+  WData = "[";
+  WCData = "[";
+  YData = "[";
+  YCData = "[";
+  ZData = "[";
+  ZCData = "[";
+  AData = "[";
+  ACData = "[";
+  CData = "[";
+  CCData = "[";
+  FData = "[";
+  FCData = "[";
+  GData = "[";
+  GCData = "[";
+  HData = "[";
+  HCData = "[";
+  JData = "[";
+  JCData = "[";
+  KData = "[";
+  KCData = "[";
+}
 
 //Functions for display
 void configureDisplay()
