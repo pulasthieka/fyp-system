@@ -64,8 +64,8 @@ db.once('open', () => {
 app.use(express.static(path.join(__dirname, 'public')));
 //adding the form page to collect patient data
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/form.html');
-  // res.sendFile(__dirname + '/plots_page.html');
+  // res.sendFile(__dirname + '/form.html');
+  res.sendFile(__dirname + '/plots_page.html');
 });
 app.get('/plots', function (req, res) {
   res.sendFile(__dirname + '/plots_page.html');
@@ -187,7 +187,7 @@ function openChangeStream(collection) {
 }
 
 function processTransmission(req, que) {
-  // console.log('Process Transmission', req);
+  console.log('Process Transmission', req);
   const d = new Date();
   let timeInt = d.getTime();
   Object.keys(req).forEach((key) => {

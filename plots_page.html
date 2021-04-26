@@ -85,11 +85,13 @@
 	<script>
 		//defining variables
 		var socket = io('http://localhost:90');//socket connection
+		// const DATA_LENGTH = 1000;
 		function saveEvent(msg) {
 			socket.emit('event', msg)
 			console.log(msg)
 		}
 		class DataChart {
+			DATA_LENGTH = 1000;
 			dataPoints = [];
 			chart = null;
 			chartOptions = {};
@@ -167,6 +169,9 @@
 					this.chart.options.axisX.viewportMaximum = null;
 					this.chart.options.axisY.viewportMinimum = null;
 					this.chart.options.axisY.viewportMaximum = null;
+				}
+				if (this.dataPoints[dps].dataPoints.length > this.DATA_LENGTH){
+					this.dataPoints[dps].dataPoints.splice(0,count)
 				}
 				this.chart.render();
 			}
