@@ -1,8 +1,8 @@
 const int device_address = 0x0D;
-const unsigned int numberOfIncremrnts = 5;
-const unsigned int incrementFrequency = 10000;
-const unsigned int settlingCycles = 200; //Must be less than 512
-const unsigned int startFrequency = 5000;
+const unsigned int numberOfIncremrnts = 2;
+const unsigned int incrementFrequency = 0;
+const unsigned int settlingCycles = 100; //Must be less than 512
+const unsigned int startFrequency = 50000;
 unsigned int currentFrequency; // variable to keep track of current frequency after frequency increment
 long img = 0;
 long real = 0;
@@ -76,7 +76,7 @@ void waitTillImpReady(void) {
   }
 }
 
-void printImp(char realChar, char imgChar) {
+void printImp(String realChar, String imgChar) {
   waitTillImpReady(); //Making sure we don't get invalid data
   real = ADread(0x94) << 7; //looks kinda funny but simple way didn't work (at least in my arduino
   real = real << 1 | ADread(0x95);

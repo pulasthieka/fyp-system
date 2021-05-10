@@ -64,7 +64,8 @@ db.once('open', () => {
 app.use(express.static(path.join(__dirname, 'public')));
 //adding the form page to collect patient data
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/form.html');
+  // res.sendFile(__dirname + '/form.html');
+  res.sendFile(__dirname + '/plots_page.html');
 });
 app.get('/plots', function (req, res) {
   res.sendFile(__dirname + '/plots_page.html');
@@ -115,7 +116,7 @@ const wss2 = new WebSocket.Server({ port: 8012 });
 
 wss.on('connection', function connection(ws, req) {
   const ip = req.socket.remoteAddress;
-  console.log('Experimental', ip);
+  console.log('New connection from', ip);
   lastRecordedTime = 0;
   ws.on('message', function incoming(message) {
     let msg;
@@ -127,21 +128,22 @@ wss.on('connection', function connection(ws, req) {
       console.log(err.message, msg);
     }
   });
-
+  ws.on('close', function informDisconnect() {
+    console.log('Device Disconnected');
+  });
   ws.send('acknowledge connection');
 });
 
 // //npm install async
 
 const q = queue(function (task, cb) {
-  console.log(task);
+  // console.log(task);
   db.collection(collectionName).updateOne(
     { _id: task.docname },
     { $push: { [task.field]: { $each: task.processed_data }, ['timeStamps']: { $each: task.time } } },
     // { upsert: true },
     (err) => {
       if (err) console.log('DB error:', err);
-      else console.log('succesFul');
       cb();
     }
   );
@@ -185,7 +187,7 @@ function openChangeStream(collection) {
 }
 
 function processTransmission(req, que) {
-  // console.log('Process Transmission', req);
+  console.log('Process Transmission', req);
   const d = new Date();
   let timeInt = d.getTime();
   Object.keys(req).forEach((key) => {
@@ -209,7 +211,7 @@ async function saveEvent(name) {
   db.collection(collectionName).updateOne({ _id: 'events' }, { $push: { [name]: lastRecordedTime } }, { upsert: true }, (err) => {
     if (err) console.log('DB error:', err);
   });
-  console.log('Saved');
+  console.log('Saved', collectionName);
 }
 
 async function createDocsIfNotExists(collectionName, prefixes) {

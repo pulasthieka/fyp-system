@@ -24,12 +24,12 @@ String payload;
 
 long SavedTime; //For timing
 
-int SerialPlot(String measurement, int value) {
+int SerialPlot(char measurement, int value) {
   //  Serial.print(measurement + ": "); Serial.print(String(value)); Serial.print("  ");
   Serial.print(measurement + String(value) + "X");
   return 0;
 }
-int SerialPlot(char measurement, long value) {
+int SerialPlot(String measurement, long value) {
   //  Serial.print(measurement + ": "); Serial.print(String(value)); Serial.print("  ");
   Serial.print(measurement + String(value) + "X");
   return 0;
