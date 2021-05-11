@@ -34,9 +34,11 @@
 		<div class="vl"></div>
 		<div>
 			<p><span id="name"></span> <span id="ct"></span>
+				<button id='clear' class="btn-link" onclick="clearPlots()">Clear</button>
 				<button id='release' class="btn-link" onclick="saveEvent('release')">Cuff Release</button>
 				<button id='occlusion' class="btn-link" onclick="saveEvent('occlusion')">Occlusion</button>
 				<button id='baseline' class="btn-link" onclick="saveEvent('baseline')">Baseline</button>
+				
 			</p>
 		</div>
 
@@ -90,6 +92,19 @@
 			socket.emit('event', msg)
 			console.log(msg)
 		}
+
+		function clearPlots() {
+			socket.emit('clear')
+			// let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
+			// let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
+			// let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
+			// let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
+			console.log("Clear Plots");
+			console.log(charts);
+			charts = newCharts();
+			console.log(charts);
+		}
+
 		class DataChart {
 			DATA_LENGTH = 1000;
 			dataPoints = [];
@@ -155,6 +170,7 @@
 			}
 
 			updateChart(upd, dps) {
+				// console.log(this.zoomed);
 				let count = upd.time.length;
 				for (var j = 0; j < count; j++) {
 					this.dataPoints[dps].dataPoints.push({
@@ -213,12 +229,17 @@
 			}
 		}
 
-		let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
-		let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
-		let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
-		let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
+		function newCharts(){
+			let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
+			let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
+			let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
+			let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
+			console.log("New charts");
+			return [chart1, chart2, chart3, chart4];
+		}
 
-
+		let charts = newCharts();
+		console.log(charts);
 		const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
 		const uid = urlParams.get('id')
@@ -226,7 +247,7 @@
 		socket.emit('db', uid)
 		// obtaining data from socket io to plot the data
 		socket.on(uid, (message) => {
-			// console.log(message);
+			console.log(message);
 			let time = [];
 			let data = [];
 			if (message.data) {
@@ -240,19 +261,20 @@
 						data.push(message.data[el])
 					}
 				})
+				// console.log(charts[0].zoomed);
 				switch (message.type) {
-					case "PData": chart1.updateChart({ time: time, data: data }, 0); break;
-					case "TData": chart2.updateChart({ time: time, data: data }, 0); break;
-					case "SData": chart3.updateChart({ time: time, data: data }, 0); break;
-					case "WData": chart4.updateChart({ time: time, data: data }, 0); break;
+					case "PData": charts[0].updateChart({ time: time, data: data }, 0); break;
+					case "TData": charts[1].updateChart({ time: time, data: data }, 0); break;
+					case "SData": charts[2].updateChart({ time: time, data: data }, 0); break;
+					case "WData": charts[3].updateChart({ time: time, data: data }, 0); break;
 
-					case "EData": chart2.updateChart({ time: time, data: data }, 2); break;
-					case "PCData": chart1.updateChart({ time: time, data: data }, 1); break;
-					case "TCData": chart2.updateChart({ time: time, data: data }, 1); break;
-					case "SCData": chart3.updateChart({ time: time, data: data }, 1); break;
-					case "WCData": chart4.updateChart({ time: time, data: data }, 1); break;
-					case "YCData": chart4.updateChart({ time: time, data: data }, 2); break;
-					case "YData": chart4.updateChart({ time: time, data: data }, 3); break;
+					case "EData": charts[1].updateChart({ time: time, data: data }, 2); break;
+					case "PCData": charts[0].updateChart({ time: time, data: data }, 1); break;
+					case "TCData": charts[1].updateChart({ time: time, data: data }, 1); break;
+					case "SCData": charts[2].updateChart({ time: time, data: data }, 1); break;
+					case "WCData": charts[3].updateChart({ time: time, data: data }, 1); break;
+					case "YCData": charts[3].updateChart({ time: time, data: data }, 2); break;
+					case "YData": charts[3].updateChart({ time: time, data: data }, 3); break;
 				}
 			}
 		});

@@ -74,18 +74,7 @@ p {
 }
 
 #stop,
-#release {
-  height: 25px;
-  width: 115px;
-  background-color: blueviolet;
-  text-align: center;
-  margin-right: 115px;
-  float: right;
-  font-size: 13px;
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
+#release,
 #baseline,
 #occlusion {
   height: 25px;
@@ -98,6 +87,19 @@ p {
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+#clear {
+  height: 25px;
+  width: 115px;
+  background-color: rgb(56, 2, 143);
+  text-align: center;
+  margin-right: 150px;
+  float: right;
+  font-size: 13px;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .switch {
   position: relative;
   display: inline-block;
