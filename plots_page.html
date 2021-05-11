@@ -104,6 +104,7 @@
 			updateInterval = 500;
 			zoomInButton;
 			zoomOutButton;
+			zoomed = false;
 
 			constructor(chartId, noOfSignals, zoomInBtn, zoomOutBtn) {
 				this.zoomInButton = document.getElementById(zoomInBtn);
@@ -117,7 +118,7 @@
 						dataPoints: [],
 					});
 				}
-
+				
 				let chartOptions = {
 					zoomEnabled: true,
 					exportEnabled: true,
@@ -129,15 +130,13 @@
 							this.axisYMax = e1.axisY[0].viewportMaximum;
 							this.axisYMin = e1.axisY[0].viewportMinimum;
 							this.resetFlag = false;
+							this.zoomed = true;
 							if (this.updateRange > 0) clearInterval(this.updateRange);
-							this.updateRange = setInterval(function () {
-								this.updateAxisRange(); //defined below
-							}, this.updateInterval);
 						} else if (e1.trigger == 'reset') {
 							this.resetFlag = true;
 							clearInterval(this.updateRange);
 						}
-					},
+					}.bind(this),
 					axisX: {
 						// {},
 						stripLines: [
@@ -164,7 +163,9 @@
 						y: upd.data[j],
 					});
 				}
-				//updateAxisRange1();
+				if (this.zoomed){
+					this.updateAxisRange(count);
+				}
 				if (this.resetFlag) {
 					this.chart.options.axisX.viewportMinimum = null;
 					this.chart.options.axisX.viewportMaximum = null;
@@ -178,12 +179,11 @@
 			}
 
 			//define updateAxisRange: function to update the axis X range on zooming
-			updateAxisRange() {
-				this.axisXMax += 1;
-				this.axisXMin += 1;
+			updateAxisRange(increment) {
+				this.axisXMax += increment;
+				this.axisXMin += increment;
 				this.chart.options.axisX.viewportMaximum = this.axisXMax;
 				this.chart.options.axisX.viewportMinimum = this.axisXMin;
-				this.chart.render();
 			}
 			//Function for zooming out
 			zoomOut() {
