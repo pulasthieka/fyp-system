@@ -24,20 +24,18 @@ String payload;
 
 long SavedTime; //For timing
 
-int SerialPlot(char measurement, int value) {
+void SerialPlot(char measurement, int value) {
   //  Serial.print(measurement + ": "); Serial.print(String(value)); Serial.print("  ");
   Serial.print(measurement + String(value) + "X");
-  return 0;
 }
-int SerialPlot(String measurement, long value) {
+void SerialPlot(String measurement, long value) {
   //  Serial.print(measurement + ": "); Serial.print(String(value)); Serial.print("  ");
   Serial.print(measurement + String(value) + "X");
-  return 0;
 }
 
 void timeThis(String msg){
 //  long timePeriod = micros()-SavedTime;
-//  Serial.print(msg);
+//  Serial.println(msg);
 //  Serial.println(timePeriod);
 //  SavedTime = micros();
 }

@@ -7,7 +7,7 @@ unsigned long previousMillis = 0;
 void PPGbegin(void) {
   I2CwriteByte(MAX30100_ADDRESS, MAX30100_MODE_CONFIG, 0x03); // SPO2 enabled
   I2CwriteByte(MAX30100_ADDRESS, MAX30100_LED_CONFIG, 0b1110111);// RED LED current
-  I2CwriteByte(MAX30100_ADDRESS, MAX30100_SPO2_CONFIG, 0b01000111); //100sps 1600us pulse
+  I2CwriteByte(MAX30100_ADDRESS, MAX30100_SPO2_CONFIG, 0b01001111); //167sps 1600us pulse
 }
 
 void TakePPG(void){
@@ -19,7 +19,6 @@ void TakePPG(void){
   I2CreadBytes(MAX30100_ADDRESS, MAX30100_FIFO_DATA, &temp[0], 4);  // Read four times from the FIFO
   long IR = (temp[0] << 8) | temp[1];  // Combine values to get the actual number
   long RED = (temp[2] << 8) | temp[3]; // Combine values to get the actual number
-  Serial.print('S'+String(RED)+'X');
   }
 // Wire.h read and write protocols
 void I2CwriteByte(uint8_t address, uint8_t subAddress, uint8_t data)
