@@ -34,9 +34,11 @@
 		<div class="vl"></div>
 		<div>
 			<p><span id="name"></span> <span id="ct"></span>
+				<button id='clear' class="btn-link" onclick="clearPlots()">Clear</button>
 				<button id='release' class="btn-link" onclick="saveEvent('release')">Cuff Release</button>
 				<button id='occlusion' class="btn-link" onclick="saveEvent('occlusion')">Occlusion</button>
 				<button id='baseline' class="btn-link" onclick="saveEvent('baseline')">Baseline</button>
+				
 			</p>
 		</div>
 
@@ -84,12 +86,19 @@
 	</div>
 	<script>
 		//defining variables
-		var socket = io('http://localhost:90');//socket connection
+		var socket = io('http://localhost:9090');//socket connection
 		// const DATA_LENGTH = 1000;
 		function saveEvent(msg) {
 			socket.emit('event', msg)
 			console.log(msg)
 		}
+
+		function clearPlots() {
+			socket.emit('clear')
+			console.log("Clear Plots");
+			charts = newCharts();
+		}
+
 		class DataChart {
 			DATA_LENGTH = 1000;
 			dataPoints = [];
@@ -104,6 +113,7 @@
 			updateInterval = 500;
 			zoomInButton;
 			zoomOutButton;
+			zoomed = false;
 
 			constructor(chartId, noOfSignals, zoomInBtn, zoomOutBtn) {
 				this.zoomInButton = document.getElementById(zoomInBtn);
@@ -117,7 +127,7 @@
 						dataPoints: [],
 					});
 				}
-
+				
 				let chartOptions = {
 					zoomEnabled: true,
 					exportEnabled: true,
@@ -129,15 +139,13 @@
 							this.axisYMax = e1.axisY[0].viewportMaximum;
 							this.axisYMin = e1.axisY[0].viewportMinimum;
 							this.resetFlag = false;
+							this.zoomed = true;
 							if (this.updateRange > 0) clearInterval(this.updateRange);
-							this.updateRange = setInterval(function () {
-								this.updateAxisRange(); //defined below
-							}, this.updateInterval);
 						} else if (e1.trigger == 'reset') {
 							this.resetFlag = true;
 							clearInterval(this.updateRange);
 						}
-					},
+					}.bind(this),
 					axisX: {
 						// {},
 						stripLines: [
@@ -156,6 +164,7 @@
 			}
 
 			updateChart(upd, dps) {
+				// console.log(this.zoomed);
 				let count = upd.time.length;
 				for (var j = 0; j < count; j++) {
 					this.dataPoints[dps].dataPoints.push({
@@ -164,7 +173,9 @@
 						y: upd.data[j],
 					});
 				}
-				//updateAxisRange1();
+				if (this.zoomed){
+					this.updateAxisRange(count);
+				}
 				if (this.resetFlag) {
 					this.chart.options.axisX.viewportMinimum = null;
 					this.chart.options.axisX.viewportMaximum = null;
@@ -178,12 +189,11 @@
 			}
 
 			//define updateAxisRange: function to update the axis X range on zooming
-			updateAxisRange() {
-				this.axisXMax += 1;
-				this.axisXMin += 1;
+			updateAxisRange(increment) {
+				this.axisXMax += increment;
+				this.axisXMin += increment;
 				this.chart.options.axisX.viewportMaximum = this.axisXMax;
 				this.chart.options.axisX.viewportMinimum = this.axisXMin;
-				this.chart.render();
 			}
 			//Function for zooming out
 			zoomOut() {
@@ -213,46 +223,42 @@
 			}
 		}
 
-		let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
-		let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
-		let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
-		let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
+		function newCharts(){
+			let chart1 = new DataChart("chartContainer1", 2, "zi1", "zo1")
+			let chart2 = new DataChart("chartContainer2", 3, "zi2", "zo2")
+			let chart3 = new DataChart("chartContainer3", 2, "zi3", "zo3")
+			let chart4 = new DataChart("chartContainer4", 4, "zi4", "zo4")
+			console.log("New charts");
+			return [chart1, chart2, chart3, chart4];
+		}
 
-
+		let charts = newCharts();
+		console.log(charts);
 		const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
 		const uid = urlParams.get('id')
 		//console.log(uid)
-		socket.emit('db', uid)
+		socket.emit('db', 'uid')
 		// obtaining data from socket io to plot the data
-		socket.on(uid, (message) => {
-			// console.log(message);
-			let time = [];
-			let data = [];
+		socket.on('signals', (message) => {
+			console.log(message);
+			let time = message.data;
+			let data = message.time;
 			if (message.data) {
-				Object.keys(message.data).forEach(el => {
-					if (el[0] == 't') {
-						time.push(Number(el.substr(11)))	
-						// time.push(Number(el.slice(4)))
-						// time.push(message.data[el]) //convert this to actual date time
-					}
-					else {
-						data.push(message.data[el])
-					}
-				})
-				switch (message.type) {
-					case "PData": chart1.updateChart({ time: time, data: data }, 0); break;
-					case "TData": chart2.updateChart({ time: time, data: data }, 0); break;
-					case "SData": chart3.updateChart({ time: time, data: data }, 0); break;
-					case "WData": chart4.updateChart({ time: time, data: data }, 0); break;
 
-					case "EData": chart2.updateChart({ time: time, data: data }, 2); break;
-					case "PCData": chart1.updateChart({ time: time, data: data }, 1); break;
-					case "TCData": chart2.updateChart({ time: time, data: data }, 1); break;
-					case "SCData": chart3.updateChart({ time: time, data: data }, 1); break;
-					case "WCData": chart4.updateChart({ time: time, data: data }, 1); break;
-					case "YCData": chart4.updateChart({ time: time, data: data }, 2); break;
-					case "YData": chart4.updateChart({ time: time, data: data }, 3); break;
+				switch (message.type) {
+					case "PData": charts[0].updateChart({ time: time, data: data }, 0); break;
+					case "TData": charts[1].updateChart({ time: time, data: data }, 0); break;
+					case "SData": charts[2].updateChart({ time: time, data: data }, 0); break;
+					case "WData": charts[3].updateChart({ time: time, data: data }, 0); break;
+
+					case "EData": charts[1].updateChart({ time: time, data: data }, 2); break;
+					case "PCData": charts[0].updateChart({ time: time, data: data }, 1); break;
+					case "TCData": charts[1].updateChart({ time: time, data: data }, 1); break;
+					case "SCData": charts[2].updateChart({ time: time, data: data }, 1); break;
+					case "WCData": charts[3].updateChart({ time: time, data: data }, 1); break;
+					case "YCData": charts[3].updateChart({ time: time, data: data }, 2); break;
+					case "YData": charts[3].updateChart({ time: time, data: data }, 3); break;
 				}
 			}
 		});

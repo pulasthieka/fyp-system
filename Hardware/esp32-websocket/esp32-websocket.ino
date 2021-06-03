@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <ArduinoJson.h> // for JSON documents
 
 #include <SPI.h>
 #include <Wire.h>
