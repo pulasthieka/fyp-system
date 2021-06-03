@@ -13,9 +13,9 @@ The following packages have to be installed.
 
 1. Create a new database
 2. Setup replica set for the new database
-   - Start mongodb `mongodb --dbpath "path-to-database"`
-   - Open a new terminal and start a mongo shell `monogo`
-   - Type `rs.initiate()`
+   - Navigate to the MongoDB installation path
+   - Open a new terminal and start a mongo shell `mongo`
+   - Type `rs.initiate()` (Make sure other there are no other running mongoDB services)
 
 #### Setup Web-app
 
@@ -32,7 +32,7 @@ Run the below commands in seperate terminals
 
 2. Start node server `nodemon server.js` or `node server.js`
 
-3. Open `index.html` in a browser
+3. Go to `http://localhost:90/plots?id=test1` to directly view the plots page.
 
 ## Navigating the graphs
 

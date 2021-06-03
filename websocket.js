@@ -36,6 +36,11 @@ socket.on('connection', (client) => {
   client.on('event', (msg) => {
     saveEvent(msg);
   });
+
+  client.on('clear', () => {
+    clearPlots();
+  });
+
   client.on('db', (msg) => {
     socket.emit(collectionName, 'connected to DB');
     createDocsIfNotExists(msg, prefixes1);
@@ -212,6 +217,11 @@ async function saveEvent(name) {
     if (err) console.log('DB error:', err);
   });
   console.log('Saved', collectionName);
+}
+
+async function clearPlots() {
+  createDocsIfNotExists(collectionName, prefixes1);
+  console.log("Collection: ", collectionName, " reset");
 }
 
 async function createDocsIfNotExists(collectionName, prefixes) {
