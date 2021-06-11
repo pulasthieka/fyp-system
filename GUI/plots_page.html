@@ -176,6 +176,7 @@
 				if (this.zoomed){
 					this.updateAxisRange(count);
 				}
+				
 				if (this.resetFlag) {
 					this.chart.options.axisX.viewportMinimum = null;
 					this.chart.options.axisX.viewportMaximum = null;
@@ -236,14 +237,14 @@
 		console.log(charts);
 		const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
-		const uid = urlParams.get('id')
+		const uid = urlParams.get('id') ? urlParams.get('id') :'defaultCollection'
 		//console.log(uid)
-		socket.emit('db', 'uid')
+		socket.emit('db', uid)
 		// obtaining data from socket io to plot the data
 		socket.on('signals', (message) => {
-			console.log(message);
-			let time = message.data;
-			let data = message.time;
+			// console.log(message);
+			let time = message.time;
+			let data = message.data;
 			if (message.data) {
 
 				switch (message.type) {

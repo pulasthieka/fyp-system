@@ -7,7 +7,7 @@ unsigned long previousMillis = 0;
 void PPGbegin(void) {
   I2CwriteByte(MAX30100_ADDRESS, MAX30100_MODE_CONFIG, 0x03); // SPO2 enabled
   I2CwriteByte(MAX30100_ADDRESS, MAX30100_LED_CONFIG, 0b1110111);// RED LED current
-  I2CwriteByte(MAX30100_ADDRESS, MAX30100_SPO2_CONFIG, 0b01001111); //167sps 1600us pulse
+  I2CwriteByte(MAX30100_ADDRESS, MAX30100_SPO2_CONFIG, 0b11001100); //167sps 1600us pulse
 }
 
 void TakePPG(void){
