@@ -5,6 +5,9 @@
 //#include <WiFiClientSecure.h>
 //#include <WebSocketsClient.h>
 
+//Status LEDs
+const int STATUS_LED1 = 5;
+const int STATUS_LED2 = 6;
 
 // DATA Vars
 String TData = "[";
@@ -33,9 +36,29 @@ void SerialPlot(String measurement, long value) {
   Serial.print(measurement + String(value) + "X");
 }
 
-void timeThis(String msg){
-//  long timePeriod = micros()-SavedTime;
-//  Serial.println(msg);
-//  Serial.println(timePeriod);
-//  SavedTime = micros();
+void timeThis(String msg) {
+  //  long timePeriod = micros()-SavedTime;
+  //  Serial.println(msg);
+  //  Serial.println(timePeriod);
+  //  SavedTime = micros();
+}
+
+void showStatus(int state) {
+  switch (state) {
+    case 1: // Ready
+      digitalWrite(STATUS_LED1, LOW);
+      digitalWrite(STATUS_LED2, LOW);
+      break;
+    case 2: // Request start
+      digitalWrite(STATUS_LED1, LOW);
+      digitalWrite(STATUS_LED2, HIGH);
+      break;
+    case 3: //Request end
+      digitalWrite(STATUS_LED1, HIGH);
+      digitalWrite(STATUS_LED2, LOW);
+      break;
+    default: // Powered On stuck
+      digitalWrite(STATUS_LED1, HIGH);
+      digitalWrite(STATUS_LED2, HIGH);
+  }
 }

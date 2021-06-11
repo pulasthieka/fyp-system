@@ -62,7 +62,6 @@ function createEventModel(collectionName) {
     },
     { collectionName: collectionName }
   );
-  console.log(eventSchema);
   return mongoose.model(collectionName + 'EventSchema', eventSchema);
 }
 
@@ -124,6 +123,11 @@ class Database {
       console.error('Cannot connect to Database', err);
     }
     return false;
+  }
+
+  async disconnect() {
+    await mongoose.connection.close();
+    return;
   }
 
   async saveUser(record) {

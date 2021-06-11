@@ -1,30 +1,66 @@
-# Quick Start
+# FYP System
 
-## Setting up ESP32
+## Arduino Installation
 
-1. Install ESP32 core for Arduino IDE (for versions prior to v1.8.13)
-2. Install the required libraries
-   - HardwareSerial by Adrian McEwen
-   - Adafruit SSD1306 by Adafruit
-   - Other libraries are either already available or installed along with others.
-3. Plug in your ESP32, select the correct COM PORT and select the board as `DOIT ESP32 DEVKIT V1`
-4. Compile and upload code
+Look at https://www.arduino.cc/en/guide/linux
 
-**WARNING :** This is designed to work alongside ATmega328P programmed with [ATmega328-ppg&bio-imp.ino](/ATmega328-ppg&bio-imp/ATmega328-ppg&bio-imp.ino) and [ATmega328-temperature.ino](/ATmega328-temperature/ATmega328-temperature.ino)
+```bash
+tar -xvf arduino-1.8.15-linux64.tar.xz
+cd arduino-1.8.15/
+sudo ./install.sh
+```
 
-#### Testing end to end system
+Adding ESP32 boards
 
-1. Connect your laptop to a Wi-Fi network
-2. Run "ipconfig" on CMD and get your laptop's IP address
-3. Update line 24 and 25 of ESP32.ino with your WiFI SSID and password
-4. Update line 27 of ESP32.ino with the IP address you obtained from step 2
-5. Program [esp32-v2.ino](esp32-v2\esp32-v2.ino) to ESP32
+1. Add https://dl.espressif.com/dl/package\_esp32\_index.json to additional board manager URLs
+2. Install **esp32** by Expressif Systems by going to `Tools>Boards>Boards Manager`
+
+Open [CombinedOpt.ino](./CombinedOpt/CombinedOpt.ino) - Atmega Code. This has no external libraries and should compile with no issues.
+
+## Install dependancies for ESP32
+
+1. WebSockets by Markus Sattler (https://github.com/Links2004/arduinoWebSockets)
+2. Adafruit SSD1306 libary. This also installs the dependent libraries. (https://github.com/stblassitude/Adafruit_SSD1306_Wemos_OLED)
+   1. Adafruit GFX
+   2. Adafruit Bus IO
+
+## Common Issues
+
+Issue with compiling for ESP32 on Ubuntu. `pyserial: module not found`.
+
+```gnome
+sudo apt install python-is-python3
+sudo apt install python3-pip
+pip install pyserial
+```
+
+Serial port permissions
+
+```gnome
+ls -l /dev/ttyUSB0
+sudo usermod -a -G dialout <username>
+```
+
+Then log out and log in
+
+## Programming ESP32
+
+1. Plug in your ESP32, select the correct COM PORT and select the board as `DOIT ESP32 DEVKIT V1`
+
+> **WARNING :** This is designed to work alongside ATmega328P programmed with [CombinedOpt.ino](./CombinedOpt/CombinedOpt.ino)
+
+2. Connect your laptop to a Wi-Fi network.
+3. Run `ipconfig` (or `ifconfig`) on the command prompt and get your laptop's IP address
+4. Update the following lines of [esp32-websocket.ino](./esp32-websocket/esp32-websocket.ino) with your WiFI SSID, password and IP address.
+   ```c++
+   const char* ssid = "wifi"; // update wifi SSID
+   const char* password = "pSW"; // enter password
+   const char* ip = "192.168.1.8"; // enter the IP address
+   ```
+5. Program [esp32-websocket.ino](./esp32-websocket/esp32-websocket.ino) to ESP32. Select the board eg: `DOIT ESP32 DEVKIT V1` (shown below). Select the port eg: COM4.
+
    <img src="..\images\ESP32-Pinout.jpg">
-6. Program [ATmega328-ppg&bio-imp.ino](/ATmega328-ppg&bio-imp/ATmega328-ppg&bio-imp.ino) to an ATmega328P and connect it's pin 3 to D2 of ESP32
-7. Program [ATmega328-temperature.ino](/ATmega328-temperature/ATmega328-temperature.ino) to an ATmega328P and connect it's pin 3 to RX2 of ESP32
-8. Connect Sensors to I2C ports and provide power to all processors
-   <img src="..\images\atmega328p-pinout.gif">
 
-9. Run [server.js](server.js) and mongoDB(with replica sets)
-   `mongod --dbpath "path-to-database" --replSet "rs"`
-10. Go to port 90 of your localhost to see data plots using `index.html`. **Note** - supporting js files, index.html and server.js must be in the same folder
+## Programming ATMEGA
+
+@TODO

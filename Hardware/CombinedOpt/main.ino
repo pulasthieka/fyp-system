@@ -2,6 +2,11 @@ float temperatureC ;
 bool isAvailablePAT = false;
 bool isAvailableTemp = false;
 
+const int READY =1;
+const int ON=  0;
+const int REQ_START = 2;
+const int REQ_END= 3;
+
 int16_t PAT = 0;
 String message = "{";
 #define PWM_PIN A3
@@ -17,13 +22,18 @@ const String IMP_IMG = "b";
 
 void setup() {
   Wire.begin();
+  
   pinMode(PWM_PIN, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(STATUS_LED1, OUTPUT);
+  pinMode(STATUS_LED2, OUTPUT);
+  
   Serial.begin(115200);
   PPGbegin();
   delay(10); //Max powerup time
-  while (!Serial);
-
+  showStatus(ON);
+  
+  while (!Serial); // await ESP32 boot
+  
   cli();//stop interrupts
   TCCR1A = 0;// set entire TCCR1A register to 0
   TCCR1B = 0;// same for TCCR1B
@@ -36,7 +46,7 @@ void setup() {
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
   sei();//allow interrupts
-
+  showStatus(READY); 
   isAvailablePAT = writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
 }
 
@@ -57,60 +67,38 @@ int event_scaler4 = 1; // offfset to have the request after command
 
 
 ISR(TIMER1_COMPA_vect) {
+//  showStatus(ON);
   sei();
   timer_count = (timer_count + 1) % 5; // reset counter for the number of events
-//  long interruptStart = micros();
-//  Serial.println("interrupted");
   getPAT();
   getPPG();
-  //  if (timer_count == 0 ) {
-  //    event_scaler0 = (event_scaler0 + 1) % TEMP_RATIO;
-  //    if (event_scaler0 == 0) {
-  //      isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis(String(timer_count) + ":request body temp:");
-  //      isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis(String(timer_count) + ":request env temp:");
-  //    }
-  //  }
-
-  //  if (timer_count == 1 ) {
-  //    event_scaler1 = (event_scaler1 + 1) % IMP_RATIO;
-  //    if (event_scaler0 == 0) {
-  //      requestImp(startFrequency, numberOfIncremrnts, incrementFrequency, settlingCycles); timeThis(String(timer_count) + ":Imp Requested:");
-  //    }
-  //  }
-
-  // if (timer_count == 0 ) {
-  //   getPAT();
-  //   getPPG();
-  // }
-
-  //  if (timer_count == 2 ) {
-  //    getPPG();
-  //  }
-
-  //  if (timer_count == 1 ) {
   event_scaler1 = (event_scaler1 + 1) % IMP_RATIO;
   if (event_scaler0 == 0) {
+    showStatus(REQ_START);
     requestImp(startFrequency, numberOfIncremrnts, incrementFrequency, settlingCycles); timeThis(String(timer_count) + ":Imp Requested:");
   }
   event_scaler3 = (event_scaler3 + 1) % IMP_RATIO;
   if (event_scaler3 == 0) {
+    showStatus(REQ_START);
     if (checkAD5933()) {
       waitTillImpReady(); //can also use checkImpReady() to check if measurement is ready
       timeThis(String(timer_count) + ":idle imp 1:");
       printImp(IMP_REAL, IMP_IMG); //Getting the sample from AD5933 and serial printing
       timeThis("5:reading imp 1:");
     }
+    showStatus(REQ_END);
   }
-  //  }
 
-  //  if (timer_count == 2 ) {
   event_scaler0 = (event_scaler0 + 1) % TEMP_RATIO;
   if (event_scaler0 == 0) {
+//    showStatus(REQ_START);
     isBodyTempAvailable = requestTemp(BodyTempAdd); timeThis(String(timer_count) + ":request body temp:");
     isEnvTempAvailable = requestTemp(EnvTempAdd); timeThis(String(timer_count) + ":request env temp:");
   }
+
   event_scaler4 = (event_scaler4 + 1) % TEMP_RATIO;
   if (event_scaler4 == 0) {
+//    showStatus(REQ_START);
     if ( isBodyTempAvailable) {
       temperatureC = getTemp(BodyTempAdd); timeThis(String(timer_count) + ":received body temp:");
       SerialPlot(BODY_TEMP_CHAR, 100 * temperatureC);
@@ -121,20 +109,16 @@ ISR(TIMER1_COMPA_vect) {
       SerialPlot(ENV_TEMP_CHAR, 100 * temperatureC);
       isEnvTempAvailable = false;
     }
-    //    }
-
   }
-//  Serial.print("interruptedEnd");
-//  Serial.println(micros() - interruptStart);
+  
 }
 
-
-int getPPG() {
   // GET ppg values
+int getPPG() {
   uint8_t temp[4] = {0};  // Temporary buffer for read values
   I2CreadBytes(MAX30100_ADDRESS, MAX30100_FIFO_DATA, &temp[0], 4);  // Read four times from the FIFO
   timeThis(String(timer_count) + "read PPG:");
-  long IR = (temp[0] << 8) | temp[1];  // Combine values to get the actual number
+  long IR = (temp[0] << 8) | temp[1];  // Combine values to get 2 byte value
   long RED = (temp[2] << 8) | temp[3]; // Combine values to get the actual number
   SerialPlot(RED_CHAR, RED );
   SerialPlot(IR_CHAR, IR );
@@ -142,11 +126,8 @@ int getPPG() {
   return 0;
 }
 
-int getPAT() {
   //  GET Pressure
-  //  isAvailablePAT = writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
-  //  timeThis("PAT ADC set:");
-  //  delayMicroseconds(1000);
+int getPAT() {
   if (isAvailablePAT) {
     timeThis("check PAT status:");
     PAT = readRegister(ADS1115_ADDRESS, ADS1015_REG_POINTER_CONVERT); timeThis("21:read PAT reg:");
@@ -156,8 +137,8 @@ int getPAT() {
     }    if (PAT > 30000) {
       digitalWrite(PWM_PIN, LOW);
     }
-    timeThis("23:fire PAT motor:");
+    //    timeThis("23:fire PAT motor:");
+    // setup ADC for next iteration
     writeRegister(ADS1115_ADDRESS, ADS1115_REG_POINTER_CONFIG, 0b1100011110000011); //128sps 0b1100011110000011 == ±1.024 V     0b1100010110000011 == = ±2.048 V (default)
-    //    timeThis("2:PAT ADC set:");
   }
 }

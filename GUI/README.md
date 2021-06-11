@@ -4,35 +4,52 @@
 
 The following packages have to be installed.
 
-1. [MongoDB](https://docs.mongodb.com/manual/installation/),
-2. NodeJS,
+1. [NodeJS](https://nodejs.org/en/)
+2. [MongoDB](https://docs.mongodb.com/manual/installation/)
 
 ## First Time install
 
-#### Setup Database
+### Setup Databases
 
-1. Create a new database
-2. Setup replica set for the new database
-   - Navigate to the MongoDB installation path
-   - Open a new terminal and start a mongo shell `mongo`
-   - Type `rs.initiate()` (Make sure other there are no other running mongoDB services)
+- Create a new database. eg: `fyp`
+- _OPTIONAL_ - Setup replica set for the new database
+  - Navigate to the MongoDB installation path
+  - Open a new terminal and start a mongo shell `mongo`
+  - Type `rs.initiate()` (Make sure other there are no other running mongoDB services)
 
-#### Setup Web-app
+### Setup Webserver
 
 1. Install all packages with `npm install`
-2. Point the server to database
-   - Change config parameter `config = { DB: "mongodb://localhost:27017/dbname?replicaSet=rs"};`
+2. If any changes were made to the hardware/ database setup, change the `config` variable in the [server.js](./server.js) file. Point the server to database and specify the ports for the gui and hardware.
+
+```js
+const config = {
+  DB: 'mongodb://127.0.0.1:27017/', // database URL
+  PORT: 9090, // GUI port see it at localhost:9090
+  WS_PORT: 8011, // hardware connection port
+};
+```
 
 ## Startup Procedure
 
 Run the below commands in seperate terminals
 
-1. Start database with replicaset
-   `mongod --dbpath "path-to-database" --replSet "rs"`
+1. Start database. Application can also work without a database. However, this means collected data will not be saved.
 
-2. Start node server `nodemon server.js` or `node server.js`
+   ```bash
+   mongod --dbpath "path-to-database"
+   ```
 
-3. Go to `http://localhost:90/plots?id=test1` to directly view the plots page.
+2. Start node server.
+
+   ```bash
+   node server.js
+   #or nodemon server.js
+   ```
+
+3. Go to [http://localhost:90/plots?id=defaultCollection](http://localhost:90/plots?id=defaultCollection) to directly view the plots page.
+
+Once hardware is connected, then data collected from the hardware will the plotted on the `plots_page.html`
 
 ## Navigating the graphs
 
@@ -44,4 +61,4 @@ You can also use the buttons above the graph to navigate the graph.
 
 ## Further help
 
-Check [Hardware](/Hardware) for instructions on setting up the hardware
+Check [Hardware](../Hardware) for instructions on setting up the hardware

@@ -2,7 +2,7 @@ const classes = require('./classes');
 const db = require('./database');
 
 const express = require('express'); //nodejs server
-const app = require('express')();
+const app = express();
 const path = require('path'); // used to deliver static file eg: CSS and JS libraries
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -27,51 +27,58 @@ server.listen(config.PORT, () => {
   console.log(`Listening on *:${config.PORT}`);
 }); //create local server
 
-const connections = [];
+const connectionList = []; // array to maintain multiple connections
 
 // SECTION: Frontend Connections
 socket.on('connection', (client) => {
-  let database;
+  console.log('New connection from', client.handshake.address);
+  let dbConnection = false;
   let collectionName;
 
+  // button clicks for events
   client.on('event', (msg) => {
-    if (database) {
+    try {
       const d = new Date();
-      const timeInt = d.getTime();
-      // get time and add to message
-      database.updateEvents(msg, [timeInt]);
-    } else {
-      console.log('Cannot save event, Database unavailable');
+      const timeInt = d.getTime(); // get time and add to message
+      dbConnection.updateEvents(msg, [timeInt]);
+    } catch (err) {
+      console.log('Cannot save event', err);
     }
   });
 
+  // clear the database
   client.on('clear', () => {
-    if (database) {
-      database.remove(); // empty database / recreate
+    if (dbConnection) {
+      dbConnection.remove(); // empty database & recreate
     } else {
       console.log('Cannot clear, Database unavailable');
     }
   });
 
-  client.on('db', (msg) => {
+  // new connection
+  client.on('db', async (msg) => {
     collectionName = !msg ? 'defaultCollection' : msg; // avoid passing null collection names
-    database = new db.Database(collectionName, bioSignals);
-    let connection = database.connect(config.DB + 'fyp'); //specify database name
-    console.log(connection);
-    if (connection) {
-      // maintain multiple connections
-      let indx = connections.length;
-      database.initiate();
-      connections.push(database);
+    dbConnection = new db.Database(collectionName, bioSignals);
+    let isConnected = await dbConnection.connect(config.DB + 'fyp'); //specify database name
+    console.log('Is connected to DB ?', isConnected);
+    if (isConnected) {
+      let indx = connectionList.length;
+      dbConnection.initiate();
+      connectionList.push(dbConnection);
       // connection.on('error', (err) => {
       //   connections = connections.splice(indx, 1);
       // });
+      console.log(`${collectionName} connected`);
     }
-    console.log(`${collectionName} connected`);
   });
 
   client.on('disconnect', () => {
-    console.log(`${collectionName} disconnected`);
+    try {
+      dbConnection.disconnect();
+      console.log(`${collectionName} disconnected`);
+    } catch (err) {
+      console.log("Couldn't disconnect", err);
+    }
   });
 });
 
@@ -88,24 +95,20 @@ wss.on('connection', function connection(ws, req) {
   ws.on('message', function incoming(message) {
     try {
       let msg = JSON.parse(message);
-
+      console.table(msg);
       Object.keys(msg).forEach((key) => {
-        // sending to the frontend
         if (msg[key].length != 0) {
-          // avoid empty messages
           let frontendMsg = messengers[key].send(msg[key]);
           socket.emit('signals', frontendMsg);
-          if (connections[0]) {
-            // writes to first connection
-            let database = connections[0];
+          if (connectionList[0]) {
+            let database = connectionList[0]; // @TODO multiple connections
             database.updateSignals(key, frontendMsg.data, frontendMsg.time); // save to db
           }
         }
       });
-
-      //processTransmission(msg, q, bioSignals);
     } catch (err) {
-      console.log(err.message, message);
+      console.log('Cannot process transmission', err.message);
+      console.table(message);
     }
   });
 
