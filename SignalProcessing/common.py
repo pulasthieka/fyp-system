@@ -9,6 +9,7 @@ from scipy.ndimage import uniform_filter1d
 from scipy import signal
 from scipy.signal import find_peaks
 from scipy import interpolate
+from scipy.signal.signaltools import detrend
 
 S_fs = 100
 P_fs = 100
@@ -38,13 +39,23 @@ def plot_raw(signal, time_stamps, name, fs):
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
     plt.grid()
-    plt.show()
+
+def detrend_sig(baseline, sig):
+    p = np.polyfit(range(1,len(baseline)+1),baseline,1)
+    z = np.polyval(p,range(1,len(sig)+1))
+    
+    return (sig-z)
 
 def remove_nan(data):
     mask = np.isnan(data)
     data[mask] = np.interp(np.flatnonzero(mask), np.flatnonzero(~mask), data[~mask])
     return data
     
+def remove_outliers(data,thresh):
+    data = data[np.where(~(data>thresh))]
+    data = data[np.where(~(data<-thresh))]
+    return remove_nan(data)
+
 def get_lowest(data):
     min = np.where(data == data.min())[0] 
     try:
@@ -81,6 +92,34 @@ def get_AUC(data, start, end):
 
     AUC = np.trapz(sig, dx=1/T_fs)
     return AUC
+
+def indices_fft(sig, fs, name):
+    # Indices: PF, PPGi,PPGVLFi
+    period = 1/fs
+    nSamples = len(sig)   
+    
+    yf = scipy.fftpack.fft(sig)
+    xf = np.linspace(0.0, 1.0/(2.0*period), nSamples//2) 
+    Yf = np.abs(yf[0:nSamples//2])
+    peaks, _ = find_peaks(Yf[500:], distance=1000)
+    PF = xf[500:][peaks[0]]
+    Af = Yf[peaks[:3]]
+    print(PF,Af)
+    PPGi = np.sum(Af)
+    PPGVLFi = PF/PPGi
+
+    plt.figure(1)
+    plt.title(name+" Frequency Response")
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Amplitude")
+    plt.plot(xf, Yf)
+    plt.plot(xf[500:][peaks[:3]], Yf[500:][peaks[:3]], "x")
+    plt.xlim(0,10)
+    plt.grid()
+
+    plt.show()
+
+    return [PF, PPGi,PPGVLFi]
 
 def long_term_indices(data, rising_seg_len, falling_seg_len):
 
@@ -130,5 +169,5 @@ dataN1 = pd.read_csv('Data/age20June272021.csv')
 time_stampsN1 = [1624810203138, 1624810504150, 1624810697546]
 
 # Reading 9
-dataP1 = pd.read_csv('Data/age23June272021.csv')
-time_stampsP1 = [1624812157099, 1624812463834, 1624812648001]
+dataM3 = pd.read_csv('Data/age23June272021.csv')
+time_stampsM3 = [1624812157099, 1624812463834, 1624812648001]
