@@ -171,3 +171,15 @@ time_stampsN1 = [1624810203138, 1624810504150, 1624810697546]
 # Reading 9
 dataM3 = pd.read_csv('Data/age23June272021.csv')
 time_stampsM3 = [1624812157099, 1624812463834, 1624812648001]
+
+# Reading 10
+dataM4 = pd.read_csv('Data/age23June292021withCold.csv')
+time_stampsM4 = [1624975875204, 1624976180767, 1624976356073]
+
+# Reading 11
+dataA5 = pd.read_csv('Data/age52June292021.csv')
+time_stampsA5 = [1624981671112, 1624981982342 , 1624982157453]
+
+# Reading 12
+dataN2 = pd.read_csv('Data/age20June292021.csv')
+time_stampsN2 = [1624983536426, 1624983837325, 1624984023832]
