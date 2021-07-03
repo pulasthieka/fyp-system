@@ -61,6 +61,10 @@ void requestImp(unsigned int startFrequency, unsigned int numberOfIncremrnts, un
   ADwrite(0x80, 0b00100001); //start swipe
 }
 
+void repeatImp(){
+  ADwrite(0x80, 0b01000001); //repeat reading
+}
+
 bool checkImpReady(void) {
   //returns True if measurement is ready
   return ((ADread(0x8F) & 0b00000010) == 2);
