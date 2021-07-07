@@ -15,7 +15,7 @@ S_fs = 100
 P_fs = 100
 T_fs = 10
 I_fs = 20
-HEIGHT = 165
+HEIGHT = 180
 
 def get_timePoints(data, time_stamps):
     b = time_stamps[0]
@@ -102,12 +102,12 @@ def indices_fft(sig, fs, name):
     xf = np.linspace(0.0, 1.0/(2.0*period), nSamples//2) 
     Yf = np.abs(yf[0:nSamples//2])
     peaks, _ = find_peaks(Yf[500:], distance=1000)
-    PF = xf[500:][peaks[0]]
-    Af = Yf[peaks[:3]]
-    print(PF,Af)
-    PPGi = np.sum(Af)
+    PF = xf[500:][peaks[:3]]
+    Af = Yf[500:][peaks[:3]]
+    PPGi = np.sum(Af)/Af[0]
     PPGVLFi = PF/PPGi
-
+    print(PF)
+    print(Af)
     plt.figure(1)
     plt.title(name+" Frequency Response")
     plt.xlabel("Frequency (Hz)")
@@ -119,7 +119,7 @@ def indices_fft(sig, fs, name):
 
     plt.show()
 
-    return [PF, PPGi,PPGVLFi]
+    return [PF, Af, PPGi, PPGVLFi]
 
 def long_term_indices(data, rising_seg_len, falling_seg_len):
 
@@ -183,3 +183,11 @@ time_stampsA5 = [1624981671112, 1624981982342 , 1624982157453]
 # Reading 12
 dataN2 = pd.read_csv('Data/age20June292021.csv')
 time_stampsN2 = [1624983536426, 1624983837325, 1624984023832]
+
+# Reading 13
+dataT2 = pd.read_csv('Data/age55July032021.csv')
+time_stampsT2 = [1625282721122, 1625283023666, 1625283203210]
+1625282620617
+# Reading 12
+dataN3 = pd.read_csv('Data/age20July032021.csv')
+time_stampsN3 = [1625285355125, 1625285667437, 1625285836317]
